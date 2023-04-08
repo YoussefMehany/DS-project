@@ -127,7 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CircularLinkedList.h" />
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="LinkedQueue.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Pri_Node.h" />
+    <ClInclude Include="Pri_Queue.h" />
     <ClInclude Include="Process.h" />
   </ItemGroup>
   <ItemGroup>
