@@ -7,6 +7,7 @@ protected:
 	ProcessorState State;
 public:
 	Processor();
+	//virtual functions
 	virtual Process* ScheduleAlgo() =0;
 	virtual void AddProcess(Process* process) =0;
 };
