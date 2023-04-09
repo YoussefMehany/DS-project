@@ -18,6 +18,26 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Data Structures\CircularLinkedList.h" />
+    <ClInclude Include="Data Structures\LinkedQueue.h" />
+    <ClInclude Include="Data Structures\Node.h" />
+    <ClInclude Include="Data Structures\Pri_Node.h" />
+    <ClInclude Include="Data Structures\Pri_Queue.h" />
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="Processors\FCFS.h" />
+    <ClInclude Include="Processors\Processor.h" />
+    <ClInclude Include="Processors\RR.h" />
+    <ClInclude Include="Processors\SJF.h" />
+    <ClInclude Include="Process\Process.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Processors\FCFS.cpp" />
+    <ClCompile Include="Processors\Processor.cpp" />
+    <ClCompile Include="Processors\RR.cpp" />
+    <ClCompile Include="Processors\SJF.cpp" />
+    <ClCompile Include="Process\Process.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -126,18 +146,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="CircularLinkedList.h" />
-    <ClInclude Include="Enums.h" />
-    <ClInclude Include="LinkedQueue.h" />
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="Pri_Node.h" />
-    <ClInclude Include="Pri_Queue.h" />
-    <ClInclude Include="Process.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Process.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

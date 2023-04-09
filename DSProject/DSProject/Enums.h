@@ -7,3 +7,7 @@ enum ProcessState {
 	TRM,
 	ORPH
 };
+enum ProcessorState {
+	BUSY,
+	IDLE
+};
