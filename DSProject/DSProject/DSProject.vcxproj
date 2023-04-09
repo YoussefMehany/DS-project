@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< Updated upstream
     <ClInclude Include="D:\Problem solving\Test\Test\CircularLinkedList.h" />
     <ClInclude Include="D:\Problem solving\Test\Test\LinkedQueue.h" />
     <ClInclude Include="D:\Problem solving\Test\Test\Node.h" />
@@ -134,9 +135,22 @@
     <ClInclude Include="D:\Problem solving\Test\Test\Pri_Queue.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Process.h" />
+=======
+    <ClInclude Include="Data Structures\CircularLinkedList.h" />
+    <ClInclude Include="Data Structures\LinkedQueue.h" />
+    <ClInclude Include="Data Structures\Node.h" />
+    <ClInclude Include="Data Structures\Pri_Node.h" />
+    <ClInclude Include="Data Structures\Pri_Queue.h" />
+    <ClInclude Include="Processor\Processor.h" />
+    <ClInclude Include="Process\Enums.h" />
+    <ClInclude Include="Process\Process.h" />
+    <ClInclude Include="Schedular.h" />
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Process.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Process\Process.cpp" />
+    <ClCompile Include="Schedular.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

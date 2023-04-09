@@ -1,0 +1,6 @@
+﻿  Main.cpp
+C:\Users\marwan\Desktop\Project_2\DS-project\DSProject\DSProject\Schedular.h(10,7): error C2065: 'Processor': undeclared identifier
+C:\Users\marwan\Desktop\Project_2\DS-project\DSProject\DSProject\Schedular.h(10,17): error C2059: syntax error: '>'
+C:\Users\marwan\Desktop\Project_2\DS-project\DSProject\DSProject\Schedular.h(14,1): error C2143: syntax error: missing ';' before '}'
+  Schedular.cpp
+  Generating Code...
