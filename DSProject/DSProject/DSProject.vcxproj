@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClInclude Include="Data Structures\CircularLinkedList.h" />
     <ClInclude Include="Data Structures\LinkedQueue.h" />
+    <ClInclude Include="Data Structures\List.h" />
     <ClInclude Include="Data Structures\Node.h" />
     <ClInclude Include="Data Structures\Pri_Node.h" />
     <ClInclude Include="Data Structures\Pri_Queue.h" />
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="Process Scheduler\Process Scheduler.h" />
     <ClInclude Include="Processors\FCFS.h" />
     <ClInclude Include="Processors\Processor.h" />
     <ClInclude Include="Processors\RR.h" />
@@ -32,6 +34,8 @@
     <ClInclude Include="Process\Process.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Process Scheduler\Process Scheduler.cpp" />
     <ClCompile Include="Processors\FCFS.cpp" />
     <ClCompile Include="Processors\Processor.cpp" />
     <ClCompile Include="Processors\RR.cpp" />

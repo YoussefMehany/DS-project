@@ -3,8 +3,8 @@ enum ProcessState {
 	NEW,
 	RDY,
 	RUN,
-	BLK,
-	TRM,
+	BLk,
+	TRm,
 	ORPH
 };
 enum ProcessorState {

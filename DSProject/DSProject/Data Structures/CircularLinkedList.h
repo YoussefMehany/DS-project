@@ -1,12 +1,12 @@
 #pragma once
 #include"Node.h"
 template <class T>
-class CirLinkedList
+class CList
 {
 	Node<T>* Head;
 	int GetLen(Node<T>* head) const;
 public:
-	CirLinkedList() { Head = NULL; }
+	CList() { Head = NULL; }
 	bool Empty()const { return !Head; }
 	int Size()const { return GetLen(Head); }
 	Node<T>* head()const { return Head; }
@@ -93,7 +93,7 @@ public:
 	}
 };
 template<class T>
-int CirLinkedList<T>::GetLen(Node<T>* head) const
+int CList<T>::GetLen(Node<T>* head) const
 {
 	if (!head)
 		return 0;

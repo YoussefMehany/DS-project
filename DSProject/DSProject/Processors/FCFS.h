@@ -1,11 +1,13 @@
 #pragma once
 #include "Processor.h"
-#include "../Data Structures/LinkedQueue.h"
+#include"../Data Structures/List.h"
 
 class FCFS: public Processor {
-	LinkedQueue<Process> RDY_LIST;
+	List<Process*> RDY_LIST;
 public:
 	FCFS();
 	virtual Process* ScheduleAlgo();
 	virtual void AddProcess(Process* process);
+	virtual void Print();
+	virtual int GET_Total_CT()const;
 };

@@ -13,6 +13,7 @@ private:
 	int WaitingTime;
 	int IORequestTime;
 	int IODuration;
+	ProcessState State;
 public:
 	Process();
 	Process(int ArrivalTime, int CPUTime , int IORequestTime , int IODuration);
@@ -29,5 +30,8 @@ public:
 	void SetResponseTime(int FirstTime);
 	void SetTurnAroundDuration();
 	void SetWaitingTime();
+	void SetState(ProcessState state);
+	ProcessState GetState()const;
+	
 };
 

@@ -1,22 +1,25 @@
 #pragma once
 #include "Node.h"
 template <typename T>
-class LinkedQueue
+class Queue
 {
 private:
 
 	Node<T>* backPtr;
 	Node<T>* frontPtr;
+	int Counter;
 public:
-	LinkedQueue();
+	Queue();
 	bool isEmpty() const;
 	bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);
 	bool peek(T& frntEntry)  const;
-	~LinkedQueue();
+	int GetSize()const;
+	void Print() const;
+	~Queue();
 
 	//copy constructor
-	LinkedQueue(const LinkedQueue<T>& LQ);
+	Queue(const Queue<T>& LQ);
 };
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -27,25 +30,33 @@ The constructor of the Queue class.
 */
 
 template <typename T>
-LinkedQueue<T>::LinkedQueue()
+Queue<T>::Queue()
 {
 	backPtr = nullptr;
 	frontPtr = nullptr;
-
+	Counter = 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
 template <typename T>
-bool LinkedQueue<T>::isEmpty() const
+bool Queue<T>::isEmpty() const
 {
 	return (frontPtr == nullptr);
 }
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+int Queue<T>::GetSize()const 
+{
+	return Counter;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool LinkedQueue<T>::enqueue(const T& newEntry)
+bool Queue<T>::enqueue(const T& newEntry)
 {
 	Node<T>* newNodePtr = new Node<T>(newEntry);
 	// Insert the new node
@@ -55,6 +66,7 @@ bool LinkedQueue<T>::enqueue(const T& newEntry)
 		backPtr->setNext(newNodePtr); // The queue was not empty
 
 	backPtr = newNodePtr; // New node is the last node now
+	Counter++;
 	return true;
 } // end enqueue
 
@@ -64,7 +76,7 @@ bool LinkedQueue<T>::enqueue(const T& newEntry)
 
 
 template <typename T>
-bool LinkedQueue<T>::dequeue(T& frntEntry)
+bool Queue<T>::dequeue(T& frntEntry)
 {
 	if (isEmpty())
 		return false;
@@ -78,14 +90,14 @@ bool LinkedQueue<T>::dequeue(T& frntEntry)
 
 	// Free memory reserved for the dequeued node
 	delete nodeToDeletePtr;
-
+	Counter--;
 	return true;
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool LinkedQueue<T>::peek(T& frntEntry) const
+bool Queue<T>::peek(T& frntEntry) const
 {
 	if (isEmpty())
 		return false;
@@ -96,7 +108,7 @@ bool LinkedQueue<T>::peek(T& frntEntry) const
 ///////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-LinkedQueue<T>::~LinkedQueue()
+Queue<T>::~Queue()
 {
 	T temp;
 
@@ -107,7 +119,7 @@ LinkedQueue<T>::~LinkedQueue()
 
 
 template <typename T>
-LinkedQueue<T>::LinkedQueue(const LinkedQueue<T>& LQ)
+Queue<T>::Queue(const Queue<T>& LQ)
 {
 	Node<T>* NodePtr = LQ.frontPtr;
 	frontPtr = backPtr = nullptr;
@@ -115,4 +127,15 @@ LinkedQueue<T>::LinkedQueue(const LinkedQueue<T>& LQ)
 		enqueue(NodePtr->getItem());
 		NodePtr = NodePtr->getNext();
 	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+void Queue<T>::Print() const
+{
+	Node<T>* temp = frontPtr;
+	cout << "[ ";
+	for (size_t i = 0; i < Counter; i++, temp = temp->getNext())
+		cout << temp->getItem() << " ";
+	cout << "]" << endl;
 }

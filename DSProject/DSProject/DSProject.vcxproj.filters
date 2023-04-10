@@ -53,6 +53,12 @@
     <ClInclude Include="Processors\RR.h">
       <Filter>Processors</Filter>
     </ClInclude>
+    <ClInclude Include="Process Scheduler\Process Scheduler.h">
+      <Filter>Process Scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="Data Structures\List.h">
+      <Filter>Data Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Process\Process.cpp">
@@ -70,5 +76,9 @@
     <ClCompile Include="Processors\RR.cpp">
       <Filter>Processors</Filter>
     </ClCompile>
+    <ClCompile Include="Process Scheduler\Process Scheduler.cpp">
+      <Filter>Process Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@ Process::Process(int ArrivalTime, int CPUTime, int IORequestTime, int IODuration
 	this->IODuration = IODuration;
 	TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
 	PID = counter++;
+	State = NEW;
 }
 int Process::GetPID()const {
 	return PID;
@@ -38,6 +39,9 @@ int Process::GetIORequestTime()const {
 int Process::GetIODuration()const {
 	return IODuration;
 }
+ProcessState Process::GetState()const {
+	return State;
+}
 void Process::SetTerminationTime(int TerminationTime) {
 	this->TerminationTime = TerminationTime;
 }
@@ -49,4 +53,7 @@ void Process::SetTurnAroundDuration() {
 }
 void Process::SetWaitingTime() {
 	WaitingTime = TurnAroundDuration - CPUTime;
+}
+void Process::SetState(ProcessState state) {
+	State = state;
 }
