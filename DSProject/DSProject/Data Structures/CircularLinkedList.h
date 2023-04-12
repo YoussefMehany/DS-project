@@ -5,8 +5,10 @@ class CList
 {
 	Node<T>* Head;
 	int GetLen(Node<T>* head) const;
+	int Counter;
 public:
-	CList() { Head = NULL; }
+	CList() { Head = NULL; Counter = 0; }
+	int getSize() const { return Counter; };
 	bool Empty()const { return !Head; }
 	int Size()const { return GetLen(Head); }
 	Node<T>* head()const { return Head; }
@@ -23,6 +25,7 @@ public:
 		else
 			tail->setNext(temp);
 		Head = temp;
+		Counter++;
 	}
 	void InsertEnd(T Val)
 	{
@@ -38,6 +41,7 @@ public:
 			tail = tail->getNext();
 		tail->setNext(temp);
 		temp->setNext(Head);
+		Counter++;
 	}
 	bool RemoveBeg()
 	{
@@ -55,6 +59,7 @@ public:
 			tail->setNext(Head);
 			delete temp2;
 		}
+		Counter--;
 		return true;
 	}
 	bool Remove(const T& Element)
@@ -75,6 +80,7 @@ public:
 			temp->setNext(bye->getNext());
 			delete bye;
 		}
+		Counter--;
 		return true;
 	}
 	void Print()const
@@ -82,13 +88,12 @@ public:
 		Node<T>* temp = Head;
 		if (!temp)
 			return;
-		cout << "[ ";
 		while (temp->getNext() != Head)
 		{
-			cout << temp->getItem() << " ";
+			cout << *temp->getItem() << ", ";
 			temp = temp->getNext();
 		}
-		cout << temp->getItem() << " " << "]" << endl;
+		cout << *temp->getItem() << endl;
 
 	}
 };

@@ -1,16 +1,16 @@
 #include "Process.h"
 
-int Process::counter = 1;
 
 Process::Process() {}
-Process::Process(int ArrivalTime, int CPUTime, int IORequestTime, int IODuration) {
+Process::Process(int ArrivalTime, int PID, int CPUTime) {
 	this->ArrivalTime = ArrivalTime;
 	this->CPUTime = CPUTime;
 	this->IORequestTime = IORequestTime;
 	this->IODuration = IODuration;
 	TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
-	PID = counter++;
+	this->PID = PID;
 	State = NEW;
+	RunProcessor = nullptr;
 }
 int Process::GetPID()const {
 	return PID;
@@ -33,14 +33,17 @@ int Process::GetTurnAroundDuration()const {
 int Process::GetWaitingTime()const {
 	return WaitingTime;
 }
-int Process::GetIORequestTime()const {
-	return IORequestTime;
-}
-int Process::GetIODuration()const {
-	return IODuration;
+Pair& Process::GetIO() {
+	Pair* IO;
+	IO_LIST.dequeue(IO);
+	return *IO;
 }
 ProcessState Process::GetState()const {
 	return State;
+}
+void Process::AddIO(int IO_R, int IO_D) {
+	Pair* IO = new Pair(IO_R, IO_D);
+	IO_LIST.enqueue(IO);
 }
 void Process::SetTerminationTime(int TerminationTime) {
 	this->TerminationTime = TerminationTime;
@@ -56,4 +59,15 @@ void Process::SetWaitingTime() {
 }
 void Process::SetState(ProcessState state) {
 	State = state;
+}
+void Process::SetProcessor(Processor* processor) {
+	RunProcessor = processor;
+}
+Processor* Process::GetProcessor() {
+	return RunProcessor;
+}
+ostream& operator<<(ostream& out, Process& process)
+{
+	out << process.PID;
+	return out;
 }

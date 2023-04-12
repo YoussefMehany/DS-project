@@ -5,7 +5,7 @@
 class FCFS: public Processor {
 	List<Process*> RDY_LIST;
 public:
-	FCFS();
+	FCFS(Scheduler* Sched);
 	virtual Process* ScheduleAlgo();
 	virtual void AddProcess(Process* process);
 	virtual void Print();

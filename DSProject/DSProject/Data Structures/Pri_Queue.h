@@ -7,12 +7,15 @@ private:
 
 	Pri_Node<T>* backPtr;
 	Pri_Node<T>* frontPtr;
+	int Counter;
 public:
 	PriorityQueue();
 	bool isEmpty() const;
 	bool enqueue(const T& newEntry, int Priority);
 	bool dequeue(T& frntEntry);
 	bool peek(T& frntEntry)  const;
+	int getSize() const;
+	void Print() const;
 	~PriorityQueue();
 
 	//copy constructor
@@ -29,6 +32,7 @@ The constructor of the Queue class.
 template <typename T>
 PriorityQueue<T>::PriorityQueue()
 {
+	Counter = 0;
 	backPtr = nullptr;
 	frontPtr = nullptr;
 
@@ -43,6 +47,13 @@ bool PriorityQueue<T>::isEmpty() const
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+int PriorityQueue<T>::getSize() const
+{
+	return Counter;
+}
+
 
 template <typename T>
 bool PriorityQueue<T>::enqueue(const T& newEntry, int Priority)
@@ -70,7 +81,7 @@ bool PriorityQueue<T>::enqueue(const T& newEntry, int Priority)
 			backPtr = newNodePtr;
 	}
 
-
+	Counter++;
 	return true;
 } // end enqueue
 
@@ -94,7 +105,7 @@ bool PriorityQueue<T>::dequeue(T& frntEntry)
 
 	// Free memory reserved for the dequeued node
 	delete nodeToDeletePtr;
-
+	Counter--;
 	return true;
 
 }
@@ -128,8 +139,21 @@ PriorityQueue<T>::PriorityQueue(const PriorityQueue<T>& LQ)
 {
 	Pri_Node<T>* NodePtr = LQ.frontPtr;
 	frontPtr = backPtr = nullptr;
+	Counter = 0;
 	while (NodePtr) {
 		enqueue(NodePtr->getItem());
 		NodePtr = NodePtr->getNext();
 	}
 }
+
+template <typename T>
+void PriorityQueue<T>::Print() const
+{
+	Pri_Node<T>* temp = frontPtr;
+	for (size_t i = 0; i < Counter; i++, temp = temp->getNext()) {
+		cout << *temp->getItem();
+		if (i < Counter - 1) cout << ", ";
+	}
+	cout << endl;
+}
+

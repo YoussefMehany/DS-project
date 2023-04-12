@@ -19,7 +19,6 @@ public:
 	{
 		item = newItem;
 		next = nullptr;
-
 	}
 
 	void setItem(T newItem)

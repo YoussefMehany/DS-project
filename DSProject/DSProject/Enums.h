@@ -1,8 +1,8 @@
 #pragma once
 enum ProcessState {
 	NEW,
-	RDY,
-	RUN,
+	RDy,
+	RUn,
 	BLk,
 	TRm,
 	ORPH

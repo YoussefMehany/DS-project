@@ -1,5 +1,6 @@
 #pragma once
 #include "Node.h"
+
 template <typename T>
 class Queue
 {
@@ -22,12 +23,6 @@ public:
 	Queue(const Queue<T>& LQ);
 };
 /////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-Function: Queue()
-The constructor of the Queue class.
-
-*/
 
 template <typename T>
 Queue<T>::Queue()
@@ -123,6 +118,7 @@ Queue<T>::Queue(const Queue<T>& LQ)
 {
 	Node<T>* NodePtr = LQ.frontPtr;
 	frontPtr = backPtr = nullptr;
+	Counter = 0;
 	while (NodePtr) {
 		enqueue(NodePtr->getItem());
 		NodePtr = NodePtr->getNext();
@@ -130,12 +126,14 @@ Queue<T>::Queue(const Queue<T>& LQ)
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
+
 template <typename T>
 void Queue<T>::Print() const
 {
 	Node<T>* temp = frontPtr;
-	cout << "[ ";
-	for (size_t i = 0; i < Counter; i++, temp = temp->getNext())
-		cout << temp->getItem() << " ";
-	cout << "]" << endl;
+	for (int i = 0; i < Counter; i++, temp = temp->getNext()) {
+		cout << *temp->getItem();
+		if (i < Counter - 1) cout << ", ";
+	}
+	cout << endl;
 }

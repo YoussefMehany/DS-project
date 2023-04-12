@@ -23,6 +23,7 @@
     <ClInclude Include="Data Structures\LinkedQueue.h" />
     <ClInclude Include="Data Structures\List.h" />
     <ClInclude Include="Data Structures\Node.h" />
+    <ClInclude Include="Data Structures\Pair.h" />
     <ClInclude Include="Data Structures\Pri_Node.h" />
     <ClInclude Include="Data Structures\Pri_Queue.h" />
     <ClInclude Include="Enums.h" />
@@ -32,6 +33,8 @@
     <ClInclude Include="Processors\RR.h" />
     <ClInclude Include="Processors\SJF.h" />
     <ClInclude Include="Process\Process.h" />
+    <ClInclude Include="UI Classes\Input.h" />
+    <ClInclude Include="UI Classes\Output.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -41,6 +44,8 @@
     <ClCompile Include="Processors\RR.cpp" />
     <ClCompile Include="Processors\SJF.cpp" />
     <ClCompile Include="Process\Process.cpp" />
+    <ClCompile Include="UI Classes\Input.cpp" />
+    <ClCompile Include="UI Classes\Output.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

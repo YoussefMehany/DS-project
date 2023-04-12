@@ -50,7 +50,7 @@ public:
 		Node<T>* temp = Head;
 		for (int i = 0; i < Pos; i++)
 			temp = temp->getNext();
-		Get = temp;
+		Get = temp->getItem();
 	}
 	bool RemoveHead(T&Get)
 	{
@@ -60,7 +60,7 @@ public:
 			Head = Head->getNext();
 			if (Size == 1)
 				Tail = Head;
-			Get = temp;
+			Get = temp->getItem();
 			delete temp;
 			Size--;
 			return true;
@@ -82,19 +82,19 @@ public:
 			}
 			prev->setNext(temp->getNext());
 			Size--;
-			Get = temp;
+			Get = temp->getItem();
 			delete temp;
 		}
 	}
 	void print()const
 	{
 		Node<T>* temp = Head;
-		cout << "[ ";
 		while (temp)
 		{
-			cout << temp->getItem() << " ";
+			cout << *temp->getItem();
 			temp = temp->getNext();
+			if (temp) cout << ", ";
 		}
-		cout << "]" << endl;
+		cout << endl;
 	}
 };
