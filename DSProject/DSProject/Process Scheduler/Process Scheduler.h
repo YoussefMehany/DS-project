@@ -37,7 +37,7 @@ public:
 	void TO_TRM(Process* P); //Move to TRM List
 	void TO_BLK(Process* P); //Move to BLK List
 	void SchedulerUpdater(Processor* P);
-	void UpdateInterface()const;
+	void UpdateInterface();
 	Input* getInput() {
 		return pIn;
 	}

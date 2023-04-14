@@ -54,16 +54,6 @@ void Scheduler::Get_Data()
 		KILLSIG.enqueue(kill);
 	}
 }
-//Processor* Scheduler::Find_Shortest( int l, int r) // for phase2
-//{
-//	Processor* Min = MultiProcessor[0];
-//	for (int i = l; i <= r; i++)
-//	{
-//		if (MultiProcessor[i]->GET_Total_CT() < Min->GET_Total_CT())
-//			Min = MultiProcessor[i];
-//	}
-//	return Min;
-//}
 bool Scheduler::Processing()
 {
 	TimeStep++;
@@ -139,8 +129,16 @@ void Scheduler::SchedulerUpdater(Processor* P) {
 	if (P->Get_Run())
 		P->Get_Run()->SetProcessor(nullptr);
 }
-void Scheduler::UpdateInterface() const
+void Scheduler::UpdateInterface()
 {
+	if (TimeStep == 0) {
+		int x = 1;
+		pOut->PrintOut("Please Enter The Mode of The Interface :\n");
+		pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
+		pIn->GetInput(x);
+		Mode = InterfaceMode(x - 1);
+		system("CLS");
+	}
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
@@ -151,11 +149,21 @@ void Scheduler::UpdateInterface() const
 	else {
 		pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
 		if (Mode == Interactive) {
-			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n"); 
-			getc(stdin); 
+			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
+			getc(stdin);
 		}
 		else Sleep(1000);
 		if (TRM.GetSize() != M)
 			system("CLS");
 	}
 }
+//Processor* Scheduler::Find_Shortest( int l, int r) // for phase2
+//{
+//	Processor* Min = MultiProcessor[0];
+//	for (int i = l; i <= r; i++)
+//	{
+//		if (MultiProcessor[i]->GET_Total_CT() < Min->GET_Total_CT())
+//			Min = MultiProcessor[i];
+//	}
+//	return Min;
+//}
