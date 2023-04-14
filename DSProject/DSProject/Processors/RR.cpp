@@ -2,8 +2,8 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-RR::RR(Scheduler* Sched)
-	:Processor(Sched) {}
+RR::RR(Scheduler* Sched,int tsr)
+	:Processor(Sched),TSR(tsr) {}
 
 Process* RR::ScheduleAlgo() {
 	Process* process = nullptr;
@@ -15,12 +15,11 @@ Process* RR::ScheduleAlgo() {
 	return process;
 }
 void RR::AddProcess(Process* process) {
-	UpdateState(process);
+	UpdateState();
 	RDY_LIST.enqueue(process);
-	Total_CT += process->GetCPUTime();
 }
-int RR::GET_Total_CT()const {
-	return Total_CT;
+int RR::GET_QFT()const {
+	return QFT;
 }
 void RR::Print() {
 	Output* pOut = S->getOutput();

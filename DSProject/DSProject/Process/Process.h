@@ -7,7 +7,7 @@ class Processor;
 class Process
 {
 private:
-	Queue<Pair*> IO_LIST;
+	Queue<Pair<int>*> IO_LIST;
 	static int counter;
 	int PID;
 	int ArrivalTime;
@@ -22,7 +22,7 @@ private:
 	Processor* RunProcessor;
 public:
 	Process();
-	friend ostream& operator<<(ostream& out, Process& process);
+	friend ostream& operator<<(ostream& out,const Process& process);
 	Process(int ArrivalTime, int PID, int CPUTime);
 	int GetPID()const;
 	int GetArrivalTime()const;
@@ -31,7 +31,7 @@ public:
 	int GetResponseTime()const;
 	int GetTurnAroundDuration()const;
 	int GetWaitingTime()const;
-	Pair& GetIO();
+	Pair<int>& GetIO();
 	void SetTerminationTime(int TerminationTime);
 	void AddIO(int IO_R, int IO_D);
 	void SetResponseTime(int FirstTime);

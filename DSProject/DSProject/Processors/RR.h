@@ -3,11 +3,12 @@
 #include"../Data Structures/LinkedQueue.h"
 
 class RR : public Processor {
+	int TSR;
 	Queue<Process*> RDY_LIST;
 public:
-	RR(Scheduler* Sched);
+	RR(Scheduler* Sched,int tsr);
 	virtual Process* ScheduleAlgo();
 	virtual void AddProcess(Process* process);
 	virtual void Print();
-	virtual int GET_Total_CT()const;
+	virtual int GET_QFT()const;
 };

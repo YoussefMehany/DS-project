@@ -11,9 +11,7 @@ public:
 	int getSize() const { return Counter; };
 	bool Empty()const { return !Head; }
 	int Size()const { return GetLen(Head); }
-	Node<T>* head()const { return Head; }
 	T HeadItem() { return Head->getItem(); }
-	Node<T>*& hhead() { return Head; }
 	void InsertBeg(T Val)
 	{
 		Node<T>* temp = new Node<T>(Val), * tail = Head;

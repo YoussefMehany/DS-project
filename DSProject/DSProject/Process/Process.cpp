@@ -33,8 +33,8 @@ int Process::GetTurnAroundDuration()const {
 int Process::GetWaitingTime()const {
 	return WaitingTime;
 }
-Pair& Process::GetIO() {
-	Pair* IO;
+Pair<int>& Process::GetIO() {
+	Pair<int>* IO;
 	IO_LIST.dequeue(IO);
 	return *IO;
 }
@@ -42,7 +42,7 @@ ProcessState Process::GetState()const {
 	return State;
 }
 void Process::AddIO(int IO_R, int IO_D) {
-	Pair* IO = new Pair(IO_R, IO_D);
+	Pair<int>* IO = new Pair<int>(IO_R, IO_D);
 	IO_LIST.enqueue(IO);
 }
 void Process::SetTerminationTime(int TerminationTime) {
@@ -66,7 +66,7 @@ void Process::SetProcessor(Processor* processor) {
 Processor* Process::GetProcessor() {
 	return RunProcessor;
 }
-ostream& operator<<(ostream& out, Process& process)
+ostream& operator<<(ostream& out,const Process& process)
 {
 	out << process.PID;
 	return out;

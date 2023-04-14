@@ -6,9 +6,9 @@ class Scheduler;
 class Processor {
 
 protected:
-	int Total_CT;
 	static int Counter;
-	int ID;
+	int QFT,ID,TBT,TIT; //TBT->Total Busy Time ,TIT->Total Idle Time, QFT->Queue Finish Time
+	double pLoad, pUtil;
 	Process* R;
 	ProcessorState State;
 	Scheduler* S;
@@ -17,6 +17,8 @@ public:
 	virtual Process* ScheduleAlgo() =0;
 	virtual void AddProcess(Process* process) =0;
 	virtual void Print() = 0;
-	virtual int GET_Total_CT()const = 0;
-	void UpdateState(Process* process);
+	virtual int GET_QFT()const = 0;
+	void UpdateState();
+	ProcessorState Get_State()const;
+	Process* Get_Run()const;
 };

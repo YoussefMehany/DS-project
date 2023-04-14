@@ -7,7 +7,7 @@ FCFS::FCFS(Scheduler* Sched)
 Process* FCFS::ScheduleAlgo() {
 	Process* process = nullptr;
 	int Rand = 0;
-	if (RDY_LIST.size() > 0)
+	if (!RDY_LIST.Empty())
 		Rand = rand() % RDY_LIST.size();
 	else return nullptr;
 	if (RDY_LIST.Remove(Rand, process)) {
@@ -22,12 +22,11 @@ Process* FCFS::ScheduleAlgo() {
 	return process;
 }
 void FCFS::AddProcess(Process* process) {
-	UpdateState(process);
+	UpdateState();
 	RDY_LIST.InsertEnd(process);
-	Total_CT += process->GetCPUTime();
 }
-int FCFS::GET_Total_CT()const {
-	return Total_CT;
+int FCFS::GET_QFT()const {
+	return QFT;
 }
 void FCFS::Print() {
 	Output* pOut = S->getOutput();

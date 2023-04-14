@@ -9,17 +9,17 @@ Process* SJF::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.dequeue(process)) {
 		State = BUSY;
 		R = process;
+		R->SetState(RUn);
 		process->SetProcessor(this);
 	}
 	return process;
 }
 void SJF::AddProcess(Process* process) {
-	UpdateState(process);
+	UpdateState();
 	RDY_LIST.enqueue(process, process->GetCPUTime());
-	Total_CT += process->GetCPUTime();
 }
-int SJF::GET_Total_CT()const{
-	return Total_CT;
+int SJF::GET_QFT()const{
+	return QFT;
 }
 void SJF::Print() {
 	Output* pOut = S->getOutput();

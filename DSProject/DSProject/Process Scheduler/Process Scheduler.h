@@ -18,24 +18,26 @@ class Scheduler
 	Input* pIn;
 	Output* pOut;
 	int TimeStep, Turn;
-	int NS, NF, NR, TSR, RTF, M, MaxW, STL, Fork_Prob;
+	int NS, NF, NR, RTF, M, MaxW, STL, Fork_Prob;
 	int Num_of_Processors; //Total number of processors
-	Queue<Process*>NEW, BLK, TRM, RUN;
-	Queue<Pair*> KILLSIG;
+	Queue<Process*>NEW, BLK, TRM;
+	Queue<Pair<int>*> KILLSIG;
 	Processor** MultiProcessor;
+	Processor* LQ, * SQ;//LQ->Longest Queue, SQ->Shortest Queue
+	InterfaceMode Mode;
 public:
 	Scheduler();
 	void Get_Data(); //Get Data from the input file
-	void AddProcessors(int FCFCcnt, int SJFcnt, int RRcnt);
+	void Set_Mode(InterfaceMode mode);
+	void AddProcessors(int FCFCcnt, int SJFcnt, int RRcnt,int TSR);
 	//Processor* Find_Shortest(int l, int r); //Find Shortest Queue
 	bool Processing(); //Dividing the Processes on the processors
 	void TO_RDY(Process* P, int& i); //Move to RDY List
 	void RET_TO_RDY(Process* P);
-	void TO_RUN(Process* P); //Move to RUN List
 	void TO_TRM(Process* P); //Move to TRM List
 	void TO_BLK(Process* P); //Move to BLK List
-	void SchedulerUpdater(Process* P);
-	void PrintData()const;
+	void SchedulerUpdater(Processor* P);
+	void UpdateInterface()const;
 	Input* getInput() {
 		return pIn;
 	}

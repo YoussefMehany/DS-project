@@ -9,5 +9,5 @@ public:
 	virtual Process* ScheduleAlgo();
 	virtual void AddProcess(Process* process);
 	virtual void Print();
-	virtual int GET_Total_CT()const;
+	virtual int GET_QFT()const;
 };

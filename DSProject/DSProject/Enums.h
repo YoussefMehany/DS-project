@@ -11,3 +11,9 @@ enum ProcessorState {
 	BUSY,
 	IDLE
 };
+enum InterfaceMode 
+{
+	Interactive,
+	SBS,
+	Silent
+};
