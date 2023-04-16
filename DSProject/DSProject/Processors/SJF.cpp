@@ -4,7 +4,7 @@
 
 SJF::SJF(Scheduler* Sched)
 	:Processor(Sched) {}
-Process* SJF::ScheduleAlgo() {
+void SJF::ScheduleAlgo() {
 	Process* process = nullptr;
 	if (State == IDLE && RDY_LIST.dequeue(process)) {
 		State = BUSY;
@@ -12,10 +12,10 @@ Process* SJF::ScheduleAlgo() {
 		R->SetState(RUn);
 		process->SetProcessor(this);
 	}
-	return process;
 }
 void SJF::AddProcess(Process* process) {
 	UpdateState();
+	process->SetProcessor(this);
 	RDY_LIST.enqueue(process, process->GetCPUTime());
 }
 int SJF::GET_QFT()const{
@@ -27,3 +27,4 @@ void SJF::Print() {
 	pOut->PrintOut("[SJF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
+void SJF::Kill(int PID) {}

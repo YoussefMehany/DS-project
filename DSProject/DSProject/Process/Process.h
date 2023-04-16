@@ -20,6 +20,7 @@ private:
 	int IODuration;
 	ProcessState State;
 	Processor* RunProcessor;
+
 public:
 	Process();
 	friend ostream& operator<<(ostream& out,const Process& process);

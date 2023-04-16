@@ -5,17 +5,18 @@
 RR::RR(Scheduler* Sched,int tsr)
 	:Processor(Sched),TSR(tsr) {}
 
-Process* RR::ScheduleAlgo() {
+void RR::ScheduleAlgo() {
 	Process* process = nullptr;
 	if (State == IDLE && RDY_LIST.dequeue(process)) {
 		State = BUSY;
 		R = process;
+		R->SetState(RUn);
 		process->SetProcessor(this);
 	}
-	return process;
 }
 void RR::AddProcess(Process* process) {
 	UpdateState();
+	process->SetProcessor(this);
 	RDY_LIST.enqueue(process);
 }
 int RR::GET_QFT()const {
@@ -27,3 +28,4 @@ void RR::Print() {
 	pOut->PrintOut("[RR]: " + to_string(RDY_LIST.GetSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
+void RR::Kill(int PID) {}

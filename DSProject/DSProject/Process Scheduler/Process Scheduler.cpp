@@ -8,6 +8,7 @@ Scheduler::Scheduler()
 {
 	TimeStep = NS = NF = NR = Num_of_Processors = RTF = M = MaxW = STL = Fork_Prob = Turn = 0;
 	MultiProcessor = nullptr;
+	IDs = nullptr;
 	pIn = new Input;
 	srand(time(0));
 	Mode = Interactive;
@@ -34,14 +35,16 @@ void Scheduler::Get_Data()
 	pIn->GetFileName(Filename);
 	InFile.open(Filename + ".txt");
 	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> M;
+	IDs = new int[M];
 	for (int i = 0; i < M; i++) {
 		int AT, ID, CPU, N, IO_R, IO_D;
 		InFile >> AT >> ID >> CPU >> N;
 		Process* process = new Process(AT, ID, CPU);
-		while (N-- > 0) {
+		IDs[i] = ID;
+		while (N--) {
 			char dummy;
 			InFile >> dummy >> IO_R >> dummy >> IO_D >> dummy;
-			if (N > 0) InFile >> dummy;
+			if (N) InFile >> dummy;
 			process->AddIO(IO_R, IO_D);
 		}
 		NEW.enqueue(process);
@@ -53,13 +56,19 @@ void Scheduler::Get_Data()
 		Pair<int>* kill = new Pair<int>(T, PID);
 		KILLSIG.enqueue(kill);
 	}
+	system("CLS");
+	int x = 1;
+	pOut->PrintOut("Please Enter The Mode of The Interface :\n");
+	pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
+	pIn->GetInput(x);
+	Mode = InterfaceMode(x - 1);
+	system("CLS");
 }
 bool Scheduler::Processing()
 {
 	TimeStep++;
 	if (TRM.GetSize() == M)
 		return false;
-
 	while (!NEW.isEmpty()) {
 		Process* temp = nullptr;
 		NEW.peek(temp);
@@ -73,8 +82,7 @@ bool Scheduler::Processing()
 
 	for (int i = 0; i < Num_of_Processors; i++) //Move process from RDY to RUN if processor is IDLE and Make the probability checking
 	{
-		Process* process = nullptr;
-		process = MultiProcessor[i]->ScheduleAlgo();
+		MultiProcessor[i]->ScheduleAlgo();
 	}
 	for (int i = 0; i < Num_of_Processors; i++) {
 		if (MultiProcessor[i]->Get_State() == BUSY) {
@@ -93,12 +101,20 @@ bool Scheduler::Processing()
 			}
 		}
 	}
+
 	Rand = 1 + rand() % 100;
 	if (Rand < 10) {
 		Process* Curr = nullptr;
-		if (BLK.dequeue(Curr)) {
-			TO_RDY(Curr, Turn);
+		if (BLK.peek(Curr)) {
+			if (Curr->GetArrivalTime() != TimeStep) { //To prevent multiple transitions for the same process  
+				BLK.dequeue(Curr);
+				TO_RDY(Curr, Turn);
+			}
 		}
+	}
+	Rand = rand() % M;
+	for (int i = 0; i < Num_of_Processors; i++) { //KILL Random process from FCFS
+		MultiProcessor[i]->Kill(IDs[Rand]);
 	}
 	return true;
 }
@@ -116,7 +132,6 @@ void Scheduler::RET_TO_RDY(Process* P) {
 	P->SetState(RDy);
 	Processor* processor = P->GetProcessor();
 	processor->AddProcess(P);
-	P->SetProcessor(nullptr);
 }
 void Scheduler::TO_RDY(Process* P, int& i)
 {
@@ -131,14 +146,6 @@ void Scheduler::SchedulerUpdater(Processor* P) {
 }
 void Scheduler::UpdateInterface()
 {
-	if (TimeStep == 0) {
-		int x = 1;
-		pOut->PrintOut("Please Enter The Mode of The Interface :\n");
-		pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
-		pIn->GetInput(x);
-		Mode = InterfaceMode(x - 1);
-		system("CLS");
-	}
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
@@ -152,7 +159,7 @@ void Scheduler::UpdateInterface()
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(1000);
+		else Sleep(250);
 		if (TRM.GetSize() != M)
 			system("CLS");
 	}

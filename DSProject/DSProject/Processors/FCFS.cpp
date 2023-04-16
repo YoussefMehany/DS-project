@@ -4,25 +4,18 @@
 FCFS::FCFS(Scheduler* Sched)
 	:Processor(Sched) {}
 
-Process* FCFS::ScheduleAlgo() {
+void FCFS::ScheduleAlgo() {
 	Process* process = nullptr;
-	int Rand = 0;
-	if (!RDY_LIST.Empty())
-		Rand = rand() % RDY_LIST.size();
-	else return nullptr;
-	if (RDY_LIST.Remove(Rand, process)) {
-		S->TO_TRM(process); //Move Random process to TRM List
-	}
-	process = nullptr;
 	if (State == IDLE && RDY_LIST.RemoveHead(process)) {
 		State = BUSY;
 		R = process;
+		R->SetState(RUn);
 		process->SetProcessor(this);
 	}
-	return process;
 }
 void FCFS::AddProcess(Process* process) {
 	UpdateState();
+	process->SetProcessor(this);
 	RDY_LIST.InsertEnd(process);
 }
 int FCFS::GET_QFT()const {
@@ -33,4 +26,16 @@ void FCFS::Print() {
 	pOut->PrintOut("Processor " + to_string(ID));
 	pOut->PrintOut("[FCFS]: " + to_string(RDY_LIST.size()) + " RDY: ");
 	RDY_LIST.print();
+}
+void FCFS::Kill(int PID) {
+	Process* p = nullptr;
+	int i = 0;
+	for (; i < RDY_LIST.size(); i++) {
+		RDY_LIST.GetItem(i, p);
+		if (p->GetPID() == PID) {
+			RDY_LIST.Remove(i, p);
+			S->TO_TRM(p);
+			return;
+		}
+	}
 }

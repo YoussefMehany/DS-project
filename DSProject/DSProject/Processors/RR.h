@@ -7,8 +7,9 @@ class RR : public Processor {
 	Queue<Process*> RDY_LIST;
 public:
 	RR(Scheduler* Sched,int tsr);
-	virtual Process* ScheduleAlgo();
+	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
+	virtual void Kill(int PID);
 	virtual void Print();
 	virtual int GET_QFT()const;
 };

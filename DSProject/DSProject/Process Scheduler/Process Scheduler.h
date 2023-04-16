@@ -25,6 +25,7 @@ class Scheduler
 	Processor** MultiProcessor;
 	Processor* LQ, * SQ;//LQ->Longest Queue, SQ->Shortest Queue
 	InterfaceMode Mode;
+	int* IDs;
 public:
 	Scheduler();
 	void Get_Data(); //Get Data from the input file

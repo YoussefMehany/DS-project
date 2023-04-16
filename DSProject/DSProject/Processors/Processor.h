@@ -14,9 +14,10 @@ protected:
 	Scheduler* S;
 public:
 	Processor(Scheduler* Sched);
-	virtual Process* ScheduleAlgo() =0;
+	virtual void ScheduleAlgo() =0;
 	virtual void AddProcess(Process* process) =0;
 	virtual void Print() = 0;
+	virtual void Kill(int PID) = 0;
 	virtual int GET_QFT()const = 0;
 	void UpdateState();
 	ProcessorState Get_State()const;
