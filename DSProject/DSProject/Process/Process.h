@@ -1,6 +1,6 @@
 #pragma once
 #include "../Enums.h"
-#include "../Data Structures/LinkedQueue.h"
+#include"../Data Structures/Queue.h"
 #include "../Data Structures/Pair.h"
 
 class Processor;
@@ -16,11 +16,9 @@ private:
 	int TerminationTime;
 	int TurnAroundDuration;
 	int WaitingTime;
-	int IORequestTime;
-	int IODuration;
 	ProcessState State;
 	Processor* RunProcessor;
-
+	Process* Child;
 public:
 	Process();
 	friend ostream& operator<<(ostream& out,const Process& process);
@@ -33,15 +31,17 @@ public:
 	int GetTurnAroundDuration()const;
 	int GetWaitingTime()const;
 	Pair<int>& GetIO();
+	Process* GetChild()const;
+	Processor* GetProcessor()const;
+	ProcessState GetState()const;
 	void SetTerminationTime(int TerminationTime);
-	void AddIO(int IO_R, int IO_D);
 	void SetResponseTime(int FirstTime);
 	void SetTurnAroundDuration();
 	void SetWaitingTime();
 	void SetState(ProcessState state);
 	void SetProcessor(Processor* processor);
-	Processor* GetProcessor();
-	ProcessState GetState()const;
+	void SetChild(Process* child);
+	void AddIO(int IO_R, int IO_D);
 	
 };
 

@@ -52,7 +52,7 @@ public:
 			temp = temp->getNext();
 		Get = temp->getItem();
 	}
-	bool RemoveHead(T&Get)
+	bool RemoveHead(T& Get)
 	{
 		if (Size)
 		{
@@ -67,7 +67,7 @@ public:
 		}
 		return false;
 	}
-	bool Remove(int Pos,T&Get)
+	bool Remove(int Pos, T& Get)
 	{
 		if (Pos < 0 || Pos >= Size)
 			return false;
@@ -86,15 +86,29 @@ public:
 			delete temp;
 		}
 	}
-	void print()const
-	{
-		Node<T>* temp = Head;
-		while (temp)
-		{
-			cout << *temp->getItem();
-			temp = temp->getNext();
-			if (temp) cout << ", ";
-		}
-		cout << endl;
-	}
+	void print()const;
 };
+template<class T>
+inline void List<T>::print()const
+{
+	Node<T>* temp = Head;
+	while (temp)
+	{
+		cout << temp->getItem();
+		temp = temp->getNext();
+		if (temp) cout << ", ";
+	}
+	cout << endl;
+}
+template<>
+inline void List<Process*>::print()const
+{
+	Node<Process*>* temp = Head;
+	while (temp)
+	{
+		cout << *temp->getItem();
+		temp = temp->getNext();
+		if (temp) cout << ", ";
+	}
+	cout << endl;
+}

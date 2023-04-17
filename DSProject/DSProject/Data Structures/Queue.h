@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.h"
-
+class Process;
+ostream& operator<<(ostream& out, const Process& process);
 template <typename T>
 class Queue
 {
@@ -16,7 +17,7 @@ public:
 	bool dequeue(T& frntEntry);
 	bool peek(T& frntEntry)  const;
 	int GetSize()const;
-	void Print() const;
+	void Print()const;
 	~Queue();
 
 	//copy constructor
@@ -25,7 +26,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-Queue<T>::Queue()
+inline Queue<T>::Queue()
 {
 	backPtr = nullptr;
 	frontPtr = nullptr;
@@ -35,7 +36,7 @@ Queue<T>::Queue()
 
 
 template <typename T>
-bool Queue<T>::isEmpty() const
+inline bool Queue<T>::isEmpty() const
 {
 	return (frontPtr == nullptr);
 }
@@ -43,7 +44,7 @@ bool Queue<T>::isEmpty() const
 
 
 template <typename T>
-int Queue<T>::GetSize()const 
+inline int Queue<T>::GetSize()const
 {
 	return Counter;
 }
@@ -51,7 +52,7 @@ int Queue<T>::GetSize()const
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool Queue<T>::enqueue(const T& newEntry)
+inline bool Queue<T>::enqueue(const T& newEntry)
 {
 	Node<T>* newNodePtr = new Node<T>(newEntry);
 	// Insert the new node
@@ -69,9 +70,8 @@ bool Queue<T>::enqueue(const T& newEntry)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
 template <typename T>
-bool Queue<T>::dequeue(T& frntEntry)
+inline bool Queue<T>::dequeue(T& frntEntry)
 {
 	if (isEmpty())
 		return false;
@@ -92,7 +92,7 @@ bool Queue<T>::dequeue(T& frntEntry)
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool Queue<T>::peek(T& frntEntry) const
+inline bool Queue<T>::peek(T& frntEntry) const
 {
 	if (isEmpty())
 		return false;
@@ -103,7 +103,7 @@ bool Queue<T>::peek(T& frntEntry) const
 ///////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-Queue<T>::~Queue()
+inline Queue<T>::~Queue()
 {
 	T temp;
 
@@ -114,7 +114,7 @@ Queue<T>::~Queue()
 
 
 template <typename T>
-Queue<T>::Queue(const Queue<T>& LQ)
+inline Queue<T>::Queue(const Queue<T>& LQ)
 {
 	Node<T>* NodePtr = LQ.frontPtr;
 	frontPtr = backPtr = nullptr;
@@ -128,9 +128,19 @@ Queue<T>::Queue(const Queue<T>& LQ)
 
 
 template <typename T>
-void Queue<T>::Print() const
+inline void Queue<T>::Print() const
 {
 	Node<T>* temp = frontPtr;
+	for (int i = 0; i < Counter; i++, temp = temp->getNext()) {
+		cout << temp->getItem();
+		if (i < Counter - 1) cout << ", ";
+	}
+	cout << endl;
+}
+template <>
+inline void Queue<Process*>::Print() const
+{
+	Node<Process*>* temp = frontPtr;
 	for (int i = 0; i < Counter; i++, temp = temp->getNext()) {
 		cout << *temp->getItem();
 		if (i < Counter - 1) cout << ", ";

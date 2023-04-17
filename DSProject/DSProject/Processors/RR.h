@@ -1,6 +1,6 @@
 #pragma once
 #include "Processor.h"
-#include"../Data Structures/LinkedQueue.h"
+#include"../Data Structures/Queue.h"
 
 class RR : public Processor {
 	int TSR;

@@ -81,19 +81,7 @@ public:
 		Counter--;
 		return true;
 	}
-	void Print()const
-	{
-		Node<T>* temp = Head;
-		if (!temp)
-			return;
-		while (temp->getNext() != Head)
-		{
-			cout << *temp->getItem() << ", ";
-			temp = temp->getNext();
-		}
-		cout << *temp->getItem() << endl;
-
-	}
+	void Print()const;
 };
 template<class T>
 int CList<T>::GetLen(Node<T>* head) const
@@ -103,4 +91,32 @@ int CList<T>::GetLen(Node<T>* head) const
 	if (head->getNext() == Head)
 		return 1;
 	return 1 + GetLen(head->getNext());
+}
+template<class T>
+void CList<T>::Print()const
+{
+	Node<T>* temp = Head;
+	if (!temp)
+		return;
+	while (temp->getNext() != Head)
+	{
+		cout << temp->getItem() << ", ";
+		temp = temp->getNext();
+	}
+	cout << *temp->getItem() << endl;
+
+}
+template<>
+inline void CList<Process*>::Print()const
+{
+	Node<Process*>* temp = Head;
+	if (!temp)
+		return;
+	while (temp->getNext() != Head)
+	{
+		cout << *temp->getItem() << ", ";
+		temp = temp->getNext();
+	}
+	cout << *temp->getItem() << endl;
+
 }

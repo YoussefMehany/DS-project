@@ -25,7 +25,7 @@
     <ClInclude Include="Data Structures\CircularLinkedList.h">
       <Filter>Data Structures</Filter>
     </ClInclude>
-    <ClInclude Include="Data Structures\LinkedQueue.h">
+    <ClInclude Include="Data Structures\Queue.h">
       <Filter>Data Structures</Filter>
     </ClInclude>
     <ClInclude Include="Data Structures\Node.h">

@@ -2,9 +2,8 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-RR::RR(Scheduler* Sched,int tsr)
+     RR::RR(Scheduler* Sched,int tsr)
 	:Processor(Sched),TSR(tsr) {}
-
 void RR::ScheduleAlgo() {
 	Process* process = nullptr;
 	if (State == IDLE && RDY_LIST.dequeue(process)) {
@@ -19,9 +18,6 @@ void RR::AddProcess(Process* process) {
 	process->SetProcessor(this);
 	RDY_LIST.enqueue(process);
 }
-int RR::GET_QFT()const {
-	return QFT;
-}
 void RR::Print() {
 	Output* pOut = S->getOutput();
 	pOut->PrintOut("Processor " + to_string(ID));
@@ -29,3 +25,6 @@ void RR::Print() {
 	RDY_LIST.Print();
 }
 void RR::Kill(int PID) {}
+int  RR::GET_QFT()const {
+	return QFT;
+}

@@ -1,9 +1,8 @@
 #include "FCFS.h"
 #include "../Process Scheduler/Process Scheduler.h"
 
-FCFS::FCFS(Scheduler* Sched)
+     FCFS::FCFS(Scheduler* Sched)
 	:Processor(Sched) {}
-
 void FCFS::ScheduleAlgo() {
 	Process* process = nullptr;
 	if (State == IDLE && RDY_LIST.RemoveHead(process)) {
@@ -17,9 +16,6 @@ void FCFS::AddProcess(Process* process) {
 	UpdateState();
 	process->SetProcessor(this);
 	RDY_LIST.InsertEnd(process);
-}
-int FCFS::GET_QFT()const {
-	return QFT;
 }
 void FCFS::Print() {
 	Output* pOut = S->getOutput();
@@ -38,4 +34,7 @@ void FCFS::Kill(int PID) {
 			return;
 		}
 	}
+}
+int  FCFS::GET_QFT()const {
+	return QFT;
 }

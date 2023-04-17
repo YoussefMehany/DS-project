@@ -23,14 +23,8 @@ public:
 };
 /////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-Function: Queue()
-The constructor of the Queue class.
-
-*/
-
 template <typename T>
-PriorityQueue<T>::PriorityQueue()
+inline PriorityQueue<T>::PriorityQueue()
 {
 	Counter = 0;
 	backPtr = nullptr;
@@ -41,7 +35,7 @@ PriorityQueue<T>::PriorityQueue()
 
 
 template <typename T>
-bool PriorityQueue<T>::isEmpty() const
+inline bool PriorityQueue<T>::isEmpty() const
 {
 	return (frontPtr == nullptr);
 }
@@ -49,14 +43,14 @@ bool PriorityQueue<T>::isEmpty() const
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-int PriorityQueue<T>::getSize() const
+inline int PriorityQueue<T>::getSize() const
 {
 	return Counter;
 }
 
 
 template <typename T>
-bool PriorityQueue<T>::enqueue(const T& newEntry, int Priority)
+inline bool PriorityQueue<T>::enqueue(const T& newEntry, int Priority)
 {
 	Pri_Node<T>* newNodePtr = new Pri_Node<T>(newEntry, Priority), * temp = frontPtr, * prev = nullptr;
 	// Insert the new node
@@ -88,10 +82,8 @@ bool PriorityQueue<T>::enqueue(const T& newEntry, int Priority)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
 template <typename T>
-bool PriorityQueue<T>::dequeue(T& frntEntry)
+inline bool PriorityQueue<T>::dequeue(T& frntEntry)
 {
 	if (isEmpty())
 		return false;
@@ -112,7 +104,7 @@ bool PriorityQueue<T>::dequeue(T& frntEntry)
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool PriorityQueue<T>::peek(T& frntEntry) const
+inline bool PriorityQueue<T>::peek(T& frntEntry) const
 {
 	if (isEmpty())
 		return false;
@@ -124,7 +116,7 @@ bool PriorityQueue<T>::peek(T& frntEntry) const
 ///////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-PriorityQueue<T>::~PriorityQueue()
+inline PriorityQueue<T>::~PriorityQueue()
 {
 	T temp;
 
@@ -135,7 +127,7 @@ PriorityQueue<T>::~PriorityQueue()
 
 
 template <typename T>
-PriorityQueue<T>::PriorityQueue(const PriorityQueue<T>& LQ)
+inline PriorityQueue<T>::PriorityQueue(const PriorityQueue<T>& LQ)
 {
 	Pri_Node<T>* NodePtr = LQ.frontPtr;
 	frontPtr = backPtr = nullptr;
@@ -147,13 +139,22 @@ PriorityQueue<T>::PriorityQueue(const PriorityQueue<T>& LQ)
 }
 
 template <typename T>
-void PriorityQueue<T>::Print() const
+inline void PriorityQueue<T>::Print() const
 {
 	Pri_Node<T>* temp = frontPtr;
 	for (size_t i = 0; i < Counter; i++, temp = temp->getNext()) {
+		cout << temp->getItem();
+		if (i < Counter - 1) cout << ", ";
+	}
+	cout << endl;
+}
+template <>
+inline void PriorityQueue<Process*>::Print() const
+{
+	Pri_Node<Process*>* temp = frontPtr;
+	for (int i = 0; i < Counter; i++, temp = temp->getNext()) {
 		cout << *temp->getItem();
 		if (i < Counter - 1) cout << ", ";
 	}
 	cout << endl;
 }
-

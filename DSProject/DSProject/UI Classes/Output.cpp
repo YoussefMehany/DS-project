@@ -1,7 +1,6 @@
 #include "Output.h"
 
-Output::Output() {}
-
+Output::Output() { }
 
 void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BLK, Queue<Process*> TRM, int timestep)
 {
@@ -31,7 +30,6 @@ void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BL
 	cout << TRM.GetSize() << " TRM: ";
 	TRM.Print();
 }
-void Output::PrintOut(string word)
-{
+void Output::PrintOut(string word){
 	cout << word;
 }
