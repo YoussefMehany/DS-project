@@ -4,7 +4,7 @@ int main()
 	Scheduler scheduler;
 	scheduler.Get_Data();
 	scheduler.UpdateInterface();
-	while (scheduler.Processing()) 
+	while (scheduler.Simulation()) 
 		scheduler.UpdateInterface();
 	return 0;
 }

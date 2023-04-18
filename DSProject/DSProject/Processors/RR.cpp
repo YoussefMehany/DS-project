@@ -2,8 +2,8 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-     RR::RR(Scheduler* Sched,int tsr)
-	:Processor(Sched),TSR(tsr) {}
+RR::RR(Scheduler* Sched, int tsr)
+	:Processor(Sched), TSR(tsr) {}
 void RR::ScheduleAlgo() {
 	Process* process = nullptr;
 	if (State == IDLE && RDY_LIST.dequeue(process)) {

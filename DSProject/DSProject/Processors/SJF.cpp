@@ -2,7 +2,7 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-     SJF::SJF(Scheduler* Sched)
+SJF::SJF(Scheduler* Sched)
 	:Processor(Sched) {}
 void SJF::ScheduleAlgo() {
 	Process* process = nullptr;
@@ -25,6 +25,6 @@ void SJF::Print() {
 	RDY_LIST.Print();
 }
 void SJF::Kill(int PID) {}
-int  SJF::GET_QFT()const{
+int  SJF::GET_QFT()const {
 	return QFT;
 }

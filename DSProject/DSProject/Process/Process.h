@@ -7,7 +7,7 @@ class Processor;
 class Process
 {
 private:
-	Queue<Pair<int>*> IO_LIST;
+	Queue<Pair<int, int>*> IO_LIST; //Queue or Pri ? not specified in the document
 	static int counter;
 	int PID;
 	int ArrivalTime;
@@ -30,7 +30,7 @@ public:
 	int GetResponseTime()const;
 	int GetTurnAroundDuration()const;
 	int GetWaitingTime()const;
-	Pair<int>& GetIO();
+	Pair<int, int>& GetIO();
 	Process* GetChild()const;
 	Processor* GetProcessor()const;
 	ProcessState GetState()const;
@@ -41,7 +41,6 @@ public:
 	void SetState(ProcessState state);
 	void SetProcessor(Processor* processor);
 	void SetChild(Process* child);
-	void AddIO(int IO_R, int IO_D);
-	
+	void AddIO(int IO_R, int IO_D);	
 };
 

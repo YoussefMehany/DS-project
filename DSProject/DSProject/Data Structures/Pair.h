@@ -1,15 +1,16 @@
 #pragma once
-template<class T>
+template<class T1, class T2>
 class Pair {
-	T first, second;
+	T1 first;
+	T2 second;
 public:
-	Pair(T fi, T se)
+	Pair(T1 fi, T2 se)
 		:first(fi), second(se) {}
 
-	T getFirst() {
+	T1 getFirst() {
 		return first;
 	}
-	T getSecond() {
+	T2 getSecond() {
 		return second;
 	}
 };

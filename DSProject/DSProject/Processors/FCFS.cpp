@@ -25,8 +25,7 @@ void FCFS::Print() {
 }
 void FCFS::Kill(int PID) {
 	Process* p = nullptr;
-	int i = 0;
-	for (; i < RDY_LIST.size(); i++) {
+	for (int i = 0; i < RDY_LIST.size(); i++) {
 		RDY_LIST.GetItem(i, p);
 		if (p->GetPID() == PID) {
 			RDY_LIST.Remove(i, p);

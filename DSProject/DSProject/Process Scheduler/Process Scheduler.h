@@ -17,15 +17,16 @@ class Scheduler
 	string Filename;
 	Input* pIn;
 	Output* pOut;
+	int* IDs;
 	int TimeStep, Turn;
 	int NS, NF, NR, RTF, M, MaxW, STL, Fork_Prob;
 	int Num_of_Processors; //Total number of processors
+	int TTAT; //Total TurnAround time
 	Queue<Process*>NEW, BLK, TRM;
-	Queue<Pair<int>*> KILLSIG;
+	Queue<Pair<int, int>*> KILLSIG;
 	Processor** MultiProcessor;
 	Processor* LQ, * SQ;  //LQ->Longest Queue, SQ->Shortest Queue
 	InterfaceMode Mode;
-	int* IDs;
 public:
 	Scheduler();
 	void Get_Data(); //Get Data from the input file
@@ -37,7 +38,7 @@ public:
 	void TO_BLK(Process* P); //Move to BLK List
 	void SchedulerUpdater(Processor* P);
 	void UpdateInterface();
-	bool Processing(); //Dividing the Processes on the processors
+	bool Simulation(); //Dividing the Processes on the processors
 	Input* getInput();
 	Output* getOutput();
 };

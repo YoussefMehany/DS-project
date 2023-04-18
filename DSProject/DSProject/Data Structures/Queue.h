@@ -1,5 +1,6 @@
 #pragma once
 #include "Node.h"
+
 class Process;
 ostream& operator<<(ostream& out, const Process& process);
 template <typename T>

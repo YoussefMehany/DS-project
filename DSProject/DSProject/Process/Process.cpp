@@ -1,13 +1,13 @@
 #include "Process.h"
 
 
-             Process::Process() {
+Process::Process() {
 	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
 	State = NEW;
 	Child = nullptr;
 	RunProcessor = nullptr;
 }
-             Process::Process(int ArrivalTime, int PID, int CPUTime) {
+Process::Process(int ArrivalTime, int PID, int CPUTime) {
 	this->ArrivalTime = ArrivalTime;
 	this->CPUTime = CPUTime;
 	TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
@@ -16,64 +16,64 @@
 	Child = nullptr;
 	RunProcessor = nullptr;
 }
-int          Process::GetPID()const {
+int Process::GetPID()const {
 	return PID;
 }
-int          Process::GetArrivalTime()const {
+int Process::GetArrivalTime()const {
 	return ArrivalTime;
 }
-int          Process::GetCPUTime()const {
+int Process::GetCPUTime()const {
 	return CPUTime;
 }
-int          Process::GetTerminationTime()const {
+int Process::GetTerminationTime()const {
 	return TerminationTime;
 }
-int          Process::GetResponseTime()const {
+int Process::GetResponseTime()const {
 	return ResponseTime;
 }
-int          Process::GetTurnAroundDuration()const {
+int Process::GetTurnAroundDuration()const {
 	return TurnAroundDuration;
 }
-int          Process::GetWaitingTime()const {
+int Process::GetWaitingTime()const {
 	return WaitingTime;
 }
-Pair<int>&   Process::GetIO() {
-	Pair<int>* IO;
+Pair<int, int>& Process::GetIO() {
+	Pair<int, int>* IO;
 	IO_LIST.dequeue(IO);
 	return *IO;
 }
-Process*     Process::GetChild()const {
+Process* Process::GetChild()const {
 	return Child;
 }
 ProcessState Process::GetState()const {
 	return State;
 }
-void         Process::AddIO(int IO_R, int IO_D) {
-	Pair<int>* IO = new Pair<int>(IO_R, IO_D);
+void Process::AddIO(int IO_R, int IO_D) {
+	Pair<int, int>* IO = new Pair<int, int>(IO_R, IO_D);
 	IO_LIST.enqueue(IO);
 }
-void         Process::SetTerminationTime(int TerminationTime) {
+void Process::SetTerminationTime(int TerminationTime) {
 	this->TerminationTime = TerminationTime;
 }
-void		 Process::SetResponseTime(int TimeFirst) {
+void Process::SetResponseTime(int TimeFirst) {
 	ResponseTime = TimeFirst - ArrivalTime;
 }
-void         Process::SetTurnAroundDuration() {
+void Process::SetTurnAroundDuration() {
 	TurnAroundDuration = TerminationTime - ArrivalTime;
 }
-void         Process::SetWaitingTime() {
+void Process::SetWaitingTime() {
 	WaitingTime = TurnAroundDuration - CPUTime;
 }
-void         Process::SetState(ProcessState state) {
+void Process::SetState(ProcessState state) {
 	State = state;
 }
-void         Process::SetProcessor(Processor* processor) {
+void Process::SetProcessor(Processor* processor) {
 	RunProcessor = processor;
 }
-void         Process::SetChild(Process* child) {
+void Process::SetChild(Process* child) {
 	Child = child;
 }
-Processor*   Process::GetProcessor() const {
+Processor* Process::GetProcessor() const {
 	return RunProcessor;
 }
 ostream& operator<<(ostream& out, const Process& process)
