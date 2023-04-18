@@ -14,7 +14,7 @@ public:
 		Node<T>* head = L.Head;
 		while (head)
 		{
-			AddTail(head->getItem());
+			InsertEnd(head->getItem());
 			head = head->getNext();
 		}
 	}
@@ -81,10 +81,12 @@ public:
 				temp = temp->getNext();
 			}
 			prev->setNext(temp->getNext());
+			if (Pos == Size - 1) Tail = prev;
 			Size--;
 			Get = temp->getItem();
 			delete temp;
 		}
+		return true;
 	}
 	void print()const;
 };

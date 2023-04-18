@@ -165,3 +165,20 @@ Input* Scheduler::getInput() {
 Output* Scheduler::getOutput() {
 	return pOut;
 }
+Scheduler::~Scheduler() {
+	delete IDs;
+	delete pIn;
+	delete pOut;
+	Process* p = nullptr;
+	while (TRM.dequeue(p)) {
+		delete p;
+	}
+	Pair<int, int>* k = nullptr;
+	while (KILLSIG.dequeue(k)) {
+		delete k;
+	}
+	for (int i = 0; i < Num_of_Processors; i++) {
+		delete MultiProcessor[i];
+	}
+	delete MultiProcessor;
+}

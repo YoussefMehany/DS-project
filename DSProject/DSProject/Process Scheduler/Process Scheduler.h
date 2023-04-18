@@ -41,4 +41,5 @@ public:
 	bool Simulation(); //Dividing the Processes on the processors
 	Input* getInput();
 	Output* getOutput();
+	~Scheduler();
 };

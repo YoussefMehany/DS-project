@@ -1,7 +1,7 @@
 #include "FCFS.h"
 #include "../Process Scheduler/Process Scheduler.h"
 
-     FCFS::FCFS(Scheduler* Sched)
+FCFS::FCFS(Scheduler* Sched)
 	:Processor(Sched) {}
 void FCFS::ScheduleAlgo() {
 	Process* process = nullptr;
