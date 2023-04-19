@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Data Structures\CircularLinkedList.h" />
     <ClInclude Include="Data Structures\Queue.h" />
     <ClInclude Include="Data Structures\List.h" />
     <ClInclude Include="Data Structures\Node.h" />

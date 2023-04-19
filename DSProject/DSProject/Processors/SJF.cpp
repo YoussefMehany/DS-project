@@ -24,7 +24,6 @@ void SJF::Print() {
 	pOut->PrintOut("[SJF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
-void SJF::Kill(int PID) {}
 int  SJF::GET_QFT()const {
 	return QFT;
 }

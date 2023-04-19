@@ -24,7 +24,6 @@ void RR::Print() {
 	pOut->PrintOut("[RR]: " + to_string(RDY_LIST.GetSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
-void RR::Kill(int PID) {}
 int  RR::GET_QFT()const {
 	return QFT;
 }

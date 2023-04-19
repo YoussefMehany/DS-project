@@ -113,7 +113,8 @@ bool Scheduler::Simulation() {
 	}
 	Rand = rand() % M;
 	for (int i = 0; i < Num_of_Processors; i++) { //KILL Random process from FCFS
-		MultiProcessor[i]->Kill(IDs[Rand]);
+		if (dynamic_cast<FCFS*>(MultiProcessor[i]))
+			((FCFS*)MultiProcessor[i])->Kill(IDs[Rand]);
 	}
 	return true;
 }

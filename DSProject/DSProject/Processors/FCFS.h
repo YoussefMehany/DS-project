@@ -8,7 +8,7 @@ public:
 	FCFS(Scheduler* Sched);
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
-	virtual void Kill(int PID);
+	void Kill(int PID);
 	virtual void Print();
 	virtual int GET_QFT()const;
 };
