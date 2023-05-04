@@ -18,21 +18,7 @@ void FCFS::ScheduleAlgo() {
 
 		QFT -= R->GetCPUTime();
 
-		if (S->Get_NR()) {
-			while (R->GetCurrWaitingTime() > S->Get_MaxW()) {
-
-				S->FCFSMigration(R);
-
-				if (RDY_LIST.RemoveHead(R)) {
-					State = BUSY;
-					if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
-					R->SetState(RUn);
-					R->SetProcessor(this);
-					QFT -= R->GetCPUTime();
-				}
-				else { State = IDLE; break; }
-			}
-		}
+		FCFSMigration(); //check for Migration Process Fisrt 
 	}
 	if (State == BUSY) {
 
@@ -42,7 +28,7 @@ void FCFS::ScheduleAlgo() {
 		if (!R->GetCPUTime())
 			S->TO_TRM(R);
 		else if (R->GetIO() && !R->GetIO()->getFirst())
-				S->TO_BLK(R);
+			S->TO_BLK(R);
 
 	}
 	else TIT++;
@@ -76,7 +62,29 @@ void FCFS::Kill(int PID) {
 		}
 	}
 }
+
+void FCFS::FCFSMigration() {
+
+	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exist or process is a child beacuse children must be in fcfs only
+		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until all a process have Waiting Time less than MaxW
+
+			S->FCFSMigration(R);
+
+			if (RDY_LIST.RemoveHead(R)) {
+				State = BUSY;
+				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+				R->SetState(RUn);
+				R->SetProcessor(this);
+				QFT -= R->GetCPUTime();
+			}
+			else { State = IDLE; break; }
+		}
+	}
+}
+
 void FCFS::Lose(Process*& Stolen) {
-	if (!RDY_LIST.RemoveHead(Stolen)) Stolen = nullptr;
+
+	if ( ( RDY_LIST.head()->GetParent() && !dynamic_cast<FCFS*>(S->GetSQ()) ) || !RDY_LIST.RemoveHead(Stolen)) Stolen = nullptr;
 	else QFT -= Stolen->GetCPUTime();
+
 }

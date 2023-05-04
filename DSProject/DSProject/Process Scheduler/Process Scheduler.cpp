@@ -165,12 +165,14 @@ void Scheduler::FCFSMigration(Process* Migrate) {
 			else if (RRSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
 				RRSQ = MultiProcessor[i];
 	}
-	if (RRSQ) RRSQ->AddProcess(Migrate);
+	RRSQ->AddProcess(Migrate);
 }
 //////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////// WORK STEALING ////////////////////////////////
-
+Processor* Scheduler::GetSQ() const {
+	return SQ;
+}
 void Scheduler::WorkStealing() {
 
 	if (!LQ) LQ = MultiProcessor[0];
@@ -188,8 +190,8 @@ void Scheduler::WorkStealing() {
 	while (LQF > 0 && StealLimit > 0.4)
 	{
 		LQ->Lose(Stolen);
-		if (Stolen)
-			SQ->AddProcess(Stolen);
+		if (!Stolen) break;
+		SQ->AddProcess(Stolen);
 		LQF = LQ->GET_QFT();
 		SQF = SQ->GET_QFT();
 		StealLimit = double(LQF - SQF) / LQF;
@@ -227,7 +229,7 @@ void Scheduler::SchedulerUpdater(Processor* P) {
 		P->Get_Run()->SetProcessor(nullptr);
 }
 void Scheduler::UpdateInterface() {
-	//cout << BLK.GetSize() << endl;
+	
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)

@@ -20,7 +20,7 @@ private:
 	int LastRunTime;
 	ProcessState State;
 	Processor* RunProcessor;
-	Process* Child;
+	Process* Child,*Parent;
 public:
 	Process();
 	friend ostream& operator<<(ostream& out,const Process& process);
@@ -36,6 +36,7 @@ public:
 	int GetLastRunTime()const;
 	Pair<int, int>* GetIO();
 	Process* GetChild()const;
+	Process* GetParent()const;
 	Processor* GetProcessor()const;
 	ProcessState GetState()const;
 	void AddWaitingTime(int Time);
@@ -47,6 +48,7 @@ public:
 	void SetState(ProcessState state);
 	void SetProcessor(Processor* processor);
 	void SetChild(Process* child);
+	void SetParent(Process* parent);
 	void AddIO(int IO_R, int IO_D);	
 	void UpdateInfo();
 };

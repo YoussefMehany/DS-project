@@ -4,7 +4,7 @@
 Process::Process() {
 	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = LastRunTime = CurrWaitingTime = 0;
 	State = NEW;
-	Child = nullptr;
+	Parent = Child = nullptr;
 	RunProcessor = nullptr;
 }
 Process::Process(int ArrivalTime, int PID, int CPUTime) {
@@ -15,6 +15,9 @@ Process::Process(int ArrivalTime, int PID, int CPUTime) {
 	State = NEW;
 	Child = nullptr;
 	RunProcessor = nullptr;
+}
+Process* Process::GetParent()const {
+	return Parent;
 }
 int Process::GetCurrWaitingTime()const {
 	return CurrWaitingTime;
@@ -78,6 +81,9 @@ void Process::SetProcessor(Processor* processor) {
 }
 void Process::SetChild(Process* child) {
 	Child = child;
+}
+void Process::SetParent(Process* parent) {
+	Parent = parent;
 }
 void Process::AddWaitingTime(int Time) {
 	CurrWaitingTime += Time;

@@ -42,6 +42,7 @@ public:
 	int  Get_TimeStep();
 	int  Get_MaxW() const;
 	int  Get_NR()  const;
+	Processor* GetSQ() const;
 	bool Simulation(); //Dividing the Processes on the processors
 	Input* getInput();
 	Output* getOutput();

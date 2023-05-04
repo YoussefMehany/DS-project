@@ -4,6 +4,7 @@
 
 class FCFS: public Processor {
 	List<Process*> RDY_LIST;
+	void FCFSMigration();
 public:
 	FCFS(Scheduler* Sched);
 	virtual void ScheduleAlgo();
