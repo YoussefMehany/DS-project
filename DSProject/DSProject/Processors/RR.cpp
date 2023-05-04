@@ -24,6 +24,7 @@ void RR::Print() {
 	pOut->PrintOut("[RR]: " + to_string(RDY_LIST.GetSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
-int  RR::GET_QFT()const {
-	return QFT;
+void RR::Lose(Process*& Stolen) {
+	if (!RDY_LIST.dequeue(Stolen)) Stolen = nullptr;
+	else QFT -= Stolen->GetCPUTime();
 }

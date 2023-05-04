@@ -4,7 +4,6 @@
 #include "../Processors/RR.h"
 #include "../Processors/SJF.h"
 #include <windows.h>
-
 Scheduler::Scheduler() {
 	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = 0;
 	MultiProcessor = nullptr;
@@ -67,9 +66,12 @@ void Scheduler::Get_Data() {
 	system("CLS");
 }
 bool Scheduler::Simulation() {
+
 	TimeStep++;
-	if (TRM.GetSize() == M)
+
+	if (TRM.GetSize() + BLK.GetSize() == M) // Have to be modified when BLK operations are Done
 		return false;
+
 	while (!NEW.isEmpty()) {
 		Process* temp = nullptr;
 		NEW.peek(temp);
@@ -79,51 +81,134 @@ bool Scheduler::Simulation() {
 		}
 		else break;
 	}
-	int Rand = 0;
 
-	for (int i = 0; i < Num_of_Processors; i++) //Move process from RDY to RUN if processor is IDLE and Make the probability checking
-	{
+	////////////////////////////////// KILLSIG //////////////////////////////////////
+
+	Pair<int, int>* Kill = nullptr;
+	KILLSIG.peek(Kill);
+	if (Kill && Kill->getFirst() == TimeStep) {
+		KILLSIG.dequeue(Kill);
+		for (int i = 0; i < Num_of_Processors; i++) {
+			if (dynamic_cast<FCFS*>(MultiProcessor[i]))  //KILL From FCFS Only , else Ignore the Signal
+				((FCFS*)MultiProcessor[i])->Kill(Kill->getSecond());
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////
+
+
+	/////////////////////////////////// WORK STEALING ///////////////////////////////
+
+	if (!(TimeStep % STL))
+		WorkStealing();
+
+	/////////////////////////////////////////////////////////////////////////////////
+
+
+	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
 		MultiProcessor[i]->ScheduleAlgo();
 	}
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (MultiProcessor[i]->Get_State() == BUSY) {
-			Rand = 1 + rand() % 100;
-			Process* process = MultiProcessor[i]->Get_Run();
-			if (Rand <= 15) {
-				TO_BLK(process);
-				SchedulerUpdater(MultiProcessor[i]);
-			}
-			else if (Rand >= 20 && Rand <= 30) {
-				RET_TO_RDY(process);
-			}
-			else if (Rand >= 50 && Rand <= 60) {
-				TO_TRM(process);
-				SchedulerUpdater(MultiProcessor[i]);
-			}
-		}
-	}
 
-	Rand = 1 + rand() % 100;
-	if (Rand < 10) {
-		Process* Curr = nullptr;
-		if (BLK.peek(Curr)) { 
-			BLK.dequeue(Curr);
-			TO_RDY(Curr, Turn);
-		}
-	}
-	Rand = rand() % M;
-	for (int i = 0; i < Num_of_Processors; i++) { //KILL Random process from FCFS
-		if (dynamic_cast<FCFS*>(MultiProcessor[i]))
-			((FCFS*)MultiProcessor[i])->Kill(IDs[Rand]);
-	}
+
+	//int Rand = 0;
+	//for (int i = 0; i < Num_of_Processors; i++) {
+	//	if (MultiProcessor[i]->Get_State() == BUSY) {
+	//		Rand = 1 + rand() % 100;
+	//		Process* process = MultiProcessor[i]->Get_Run();
+	//		if (Rand <= 15) {
+	//			TO_BLK(process);
+	//			SchedulerUpdater(MultiProcessor[i]);
+	//		}
+	//		else if (Rand >= 20 && Rand <= 30) {
+	//			RET_TO_RDY(process);
+	//		}
+	//		else if (Rand >= 50 && Rand <= 60) {
+	//			TO_TRM(process);
+	//			SchedulerUpdater(MultiProcessor[i]);
+	//		}
+	//	}
+	//}
+
+	//Rand = 1 + rand() % 100;
+	//if (Rand < 10) {
+	//	Process* Curr = nullptr;
+	//	if (BLK.peek(Curr)) {
+	//		BLK.dequeue(Curr);
+	//		TO_RDY(Curr, Turn);
+	//	}
+	//}
+	//Rand = rand() % M;
+	//for (int i = 0; i < Num_of_Processors; i++) {    //KILL Random process from FCFS
+	//	if (dynamic_cast<FCFS*>(MultiProcessor[i]))
+	//		((FCFS*)MultiProcessor[i])->Kill(IDs[Rand]);
+	//}
+
 	return true;
 }
+
+/////////////////////////////////// FCSF->RR Migration////////////////////////////
+int Scheduler::Get_MaxW()const {
+	return MaxW;
+}
+int Scheduler::Get_NR()  const {
+	return NR;
+}
+void Scheduler::FCFSMigration(Process* Migrate) {
+	Migrate->SetState(RDy);
+	Migrate->GetProcessor()->UpdateState();
+	Migrate->SetProcessor(nullptr);
+	Processor* RRSQ = nullptr; //RR Shortest Ready Queue
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<RR*>(MultiProcessor[i]))
+			if (!RRSQ)
+				RRSQ = MultiProcessor[i];
+			else if (RRSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
+				RRSQ = MultiProcessor[i];
+	}
+	if (RRSQ) RRSQ->AddProcess(Migrate);
+}
+//////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////// WORK STEALING ////////////////////////////////
+
+void Scheduler::WorkStealing() {
+
+	if (!LQ) LQ = MultiProcessor[0];
+	if (!SQ) SQ = MultiProcessor[0];
+
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (LQ->GET_QFT() < MultiProcessor[i]->GET_QFT()) LQ = MultiProcessor[i];
+		if (SQ->GET_QFT() > MultiProcessor[i]->GET_QFT()) SQ = MultiProcessor[i];
+	}
+
+	Process* Stolen = nullptr;
+	int LQF = LQ->GET_QFT(), SQF = SQ->GET_QFT();
+	double StealLimit = double(LQF - SQF) / LQF;
+
+	while (LQF > 0 && StealLimit > 0.4)
+	{
+		LQ->Lose(Stolen);
+		if (Stolen)
+			SQ->AddProcess(Stolen);
+		LQF = LQ->GET_QFT();
+		SQF = SQ->GET_QFT();
+		StealLimit = double(LQF - SQF) / LQF;
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
 void Scheduler::TO_BLK(Process* P) {
 	P->SetState(BLk);
+	P->GetProcessor()->UpdateState();
+	P->SetProcessor(nullptr);
 	BLK.enqueue(P);
 }
 void Scheduler::TO_TRM(Process* P) {
+	P->SetTerminationTime(TimeStep);
 	P->SetState(TRm);
+	P->GetProcessor()->UpdateState();
+	P->SetProcessor(nullptr);
 	TRM.enqueue(P);
 }
 void Scheduler::RET_TO_RDY(Process* P) {
@@ -142,11 +227,12 @@ void Scheduler::SchedulerUpdater(Processor* P) {
 		P->Get_Run()->SetProcessor(nullptr);
 }
 void Scheduler::UpdateInterface() {
+	//cout << BLK.GetSize() << endl;
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
 			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
-		if (TRM.GetSize() == M)
+		if (TRM.GetSize() + BLK.GetSize() == M)  // Have to be modified when BLK operations are Done
 			pOut->PrintOut("Simulation ends, Output file created\n");
 	}
 	else {
@@ -155,10 +241,13 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(250);
+		else Sleep(100);
 		if (TRM.GetSize() != M)
 			system("CLS");
 	}
+}
+int Scheduler::Get_TimeStep() {
+	return TimeStep;
 }
 Input* Scheduler::getInput() {
 	return pIn;

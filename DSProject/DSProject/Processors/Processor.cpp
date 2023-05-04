@@ -16,3 +16,9 @@ ProcessorState Processor::Get_State()const {
 Process* Processor::Get_Run()const {
 	return R;
 }
+int Processor::GET_QFT()const{
+	return QFT;
+}
+double Processor::Get_pUtil() const {
+	return (double(TBT) / (TIT + TBT)) * 100;
+}

@@ -16,6 +16,8 @@ private:
 	int TerminationTime;
 	int TurnAroundDuration;
 	int WaitingTime;
+	int CurrWaitingTime;
+	int LastRunTime;
 	ProcessState State;
 	Processor* RunProcessor;
 	Process* Child;
@@ -30,10 +32,14 @@ public:
 	int GetResponseTime()const;
 	int GetTurnAroundDuration()const;
 	int GetWaitingTime()const;
-	Pair<int, int>& GetIO();
+	int GetCurrWaitingTime()const;
+	int GetLastRunTime()const;
+	Pair<int, int>* GetIO();
 	Process* GetChild()const;
 	Processor* GetProcessor()const;
 	ProcessState GetState()const;
+	void AddWaitingTime(int Time);
+	void SetLastRunTime(int Time);
 	void SetTerminationTime(int TerminationTime);
 	void SetResponseTime(int FirstTime);
 	void SetTurnAroundDuration();
@@ -42,5 +48,6 @@ public:
 	void SetProcessor(Processor* processor);
 	void SetChild(Process* child);
 	void AddIO(int IO_R, int IO_D);	
+	void UpdateInfo();
 };
 

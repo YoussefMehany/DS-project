@@ -2,7 +2,7 @@
 
 
 Process::Process() {
-	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
+	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = LastRunTime = CurrWaitingTime = 0;
 	State = NEW;
 	Child = nullptr;
 	RunProcessor = nullptr;
@@ -15,6 +15,12 @@ Process::Process(int ArrivalTime, int PID, int CPUTime) {
 	State = NEW;
 	Child = nullptr;
 	RunProcessor = nullptr;
+}
+int Process::GetCurrWaitingTime()const {
+	return CurrWaitingTime;
+}
+int Process::GetLastRunTime()const {
+	return LastRunTime;
 }
 int Process::GetPID()const {
 	return PID;
@@ -37,10 +43,10 @@ int Process::GetTurnAroundDuration()const {
 int Process::GetWaitingTime()const {
 	return WaitingTime;
 }
-Pair<int, int>& Process::GetIO() {
-	Pair<int, int>* IO;
-	IO_LIST.dequeue(IO);
-	return *IO;
+Pair<int, int>* Process::GetIO() {
+	Pair<int, int>* IO = nullptr;
+	IO_LIST.peek(IO);
+	return IO;
 }
 Process* Process::GetChild()const {
 	return Child;
@@ -72,6 +78,20 @@ void Process::SetProcessor(Processor* processor) {
 }
 void Process::SetChild(Process* child) {
 	Child = child;
+}
+void Process::AddWaitingTime(int Time) {
+	CurrWaitingTime += Time;
+}
+void Process::SetLastRunTime(int Time) {
+	LastRunTime = Time;
+}
+void Process::UpdateInfo() {
+	if (CPUTime) CPUTime--;
+
+	Pair<int, int>* IO = nullptr;
+	IO_LIST.peek(IO);
+	if (IO && IO->getFirst())
+		IO->SetFirst(IO->getFirst() - 1);
 }
 Processor* Process::GetProcessor() const {
 	return RunProcessor;

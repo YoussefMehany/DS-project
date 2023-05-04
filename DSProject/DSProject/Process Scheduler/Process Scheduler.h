@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include"../Process/Process.h"
 #include"../Processors/Processor.h"
-#include"../Data Structures/CircularLinkedList.h"
 #include"../Data Structures/Queue.h"
 #include"../Data Structures/Pri_Queue.h"
 #include"../Data Structures/Pair.h"
@@ -37,7 +36,12 @@ public:
 	void TO_TRM(Process* P); //Move to TRM List
 	void TO_BLK(Process* P); //Move to BLK List
 	void SchedulerUpdater(Processor* P);
-	void UpdateInterface();
+	void UpdateInterface();	
+	void WorkStealing();
+	void FCFSMigration(Process* Migrate);
+	int  Get_TimeStep();
+	int  Get_MaxW() const;
+	int  Get_NR()  const;
 	bool Simulation(); //Dividing the Processes on the processors
 	Input* getInput();
 	Output* getOutput();

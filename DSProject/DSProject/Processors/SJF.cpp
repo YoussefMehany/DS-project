@@ -24,6 +24,7 @@ void SJF::Print() {
 	pOut->PrintOut("[SJF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
-int  SJF::GET_QFT()const {
-	return QFT;
+void SJF::Lose(Process*& Stolen) {
+	if (!RDY_LIST.dequeue(Stolen)) Stolen = nullptr;
+	else QFT -= Stolen->GetCPUTime();
 }

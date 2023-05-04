@@ -8,6 +8,6 @@ public:
 	SJF(Scheduler* Sched);
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
+	virtual void Lose(Process*& Stolen);
 	virtual void Print();
-	virtual int GET_QFT()const;
 };
