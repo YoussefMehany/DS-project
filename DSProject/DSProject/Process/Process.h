@@ -8,7 +8,7 @@ class Process
 {
 private:
 	Queue<Pair<int, int>*> IO_LIST; //Queue or Pri ? not specified in the document
-	static int counter;
+	static int counter, TTAT;
 	int PID;
 	int ArrivalTime;
 	int ResponseTime;
@@ -51,5 +51,7 @@ public:
 	void SetParent(Process* parent);
 	void AddIO(int IO_R, int IO_D);	
 	void UpdateInfo();
+	void SetChildState(bool par = true);
+	static int GetTTAT();
 };
 

@@ -18,20 +18,34 @@ void FCFS::ScheduleAlgo() {
 
 		QFT -= R->GetCPUTime();
 
-		FCFSMigration(); //check for Migration Process Fisrt 
+		FCFSMigration(); //check for Migration Process First 
 	}
 	if (State == BUSY) {
 
 		TBT++;
 		R->UpdateInfo();
 
-		if (!R->GetCPUTime())
+		if (!R->GetCPUTime()) {
 			S->TO_TRM(R);
+			R->SetChildState(); //set children to orphans
+		}
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
 
 	}
 	else TIT++;
+}
+
+void FCFS::RemoveOrphans() {
+	for (int i = 0; i < RDY_LIST.size(); i++) {
+		Process* p = nullptr;
+		RDY_LIST.GetItem(i, p);
+		if (p->GetState() == ORPH) {
+			S->TO_TRM(p);
+			RDY_LIST.Remove(i, p);
+			//QFT -= p->GetCPUTime(); need to discuss
+		}
+	}
 }
 
 void FCFS::AddProcess(Process* process) {
@@ -65,8 +79,8 @@ void FCFS::Kill(int PID) {
 
 void FCFS::FCFSMigration() {
 
-	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exist or process is a child beacuse children must be in fcfs only
-		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until all a process have Waiting Time less than MaxW
+	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
+		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
 
 			S->FCFSMigration(R);
 

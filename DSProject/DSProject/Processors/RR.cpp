@@ -12,6 +12,12 @@ void RR::ScheduleAlgo() {
 		R->SetState(RUn);
 		process->SetProcessor(this);
 	}
+	if (State == BUSY) {
+		TBT++;
+	}
+	else {
+		TIT++;
+	}
 }
 void RR::AddProcess(Process* process) {
 	UpdateState();

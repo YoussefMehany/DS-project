@@ -22,3 +22,6 @@ int Processor::GET_QFT()const{
 double Processor::Get_pUtil() const {
 	return (double(TBT) / (TIT + TBT)) * 100;
 }
+double Processor::Get_pLoad() const {
+	return (double(TBT) / Process::GetTTAT()) * 100;
+}

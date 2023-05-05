@@ -12,6 +12,12 @@ void SJF::ScheduleAlgo() {
 		R->SetState(RUn);
 		process->SetProcessor(this);
 	}
+	if (State == BUSY) {
+		TBT++;
+	}
+	else {
+		TIT++;
+	}
 }
 void SJF::AddProcess(Process* process) {
 	UpdateState();

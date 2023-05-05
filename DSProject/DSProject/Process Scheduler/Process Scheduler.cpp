@@ -82,6 +82,8 @@ bool Scheduler::Simulation() {
 		else break;
 	}
 
+	
+
 	////////////////////////////////// KILLSIG //////////////////////////////////////
 
 	Pair<int, int>* Kill = nullptr;
@@ -107,6 +109,15 @@ bool Scheduler::Simulation() {
 
 	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
 		MultiProcessor[i]->ScheduleAlgo();
+	}
+
+
+	/////////////////////////////////// Forking ///////////////////////////////
+
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
+			((FCFS*)MultiProcessor[i])->RemoveOrphans();
+		}
 	}
 
 

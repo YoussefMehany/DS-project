@@ -10,6 +10,7 @@ public:
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
 	virtual void Lose(Process*& Leave) ;
+	void RemoveOrphans();
 	void Kill(int PID);
 	virtual void Print();
 };

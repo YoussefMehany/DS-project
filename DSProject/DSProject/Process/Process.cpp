@@ -1,6 +1,6 @@
 #include "Process.h"
 
-
+int Process::TTAT = 0;
 Process::Process() {
 	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = LastRunTime = CurrWaitingTime = 0;
 	State = NEW;
@@ -15,9 +15,6 @@ Process::Process(int ArrivalTime, int PID, int CPUTime) {
 	State = NEW;
 	Child = nullptr;
 	RunProcessor = nullptr;
-}
-Process* Process::GetParent()const {
-	return Parent;
 }
 int Process::GetCurrWaitingTime()const {
 	return CurrWaitingTime;
@@ -54,6 +51,9 @@ Pair<int, int>* Process::GetIO() {
 Process* Process::GetChild()const {
 	return Child;
 }
+Process* Process::GetParent()const {
+	return Parent;
+}
 ProcessState Process::GetState()const {
 	return State;
 }
@@ -69,6 +69,10 @@ void Process::SetResponseTime(int TimeFirst) {
 }
 void Process::SetTurnAroundDuration() {
 	TurnAroundDuration = TerminationTime - ArrivalTime;
+	TTAT += TurnAroundDuration;
+}
+int Process::GetTTAT() {
+	return TTAT;
 }
 void Process::SetWaitingTime() {
 	WaitingTime = TurnAroundDuration - CPUTime;
@@ -80,6 +84,8 @@ void Process::SetProcessor(Processor* processor) {
 	RunProcessor = processor;
 }
 void Process::SetChild(Process* child) {
+	if(child) 
+		child->SetParent(this);
 	Child = child;
 }
 void Process::SetParent(Process* parent) {
@@ -98,6 +104,18 @@ void Process::UpdateInfo() {
 	IO_LIST.peek(IO);
 	if (IO && IO->getFirst())
 		IO->SetFirst(IO->getFirst() - 1);
+}
+void Process::SetChildState(bool par) { //to set all children states to be orphans
+	if (Parent) {
+		Parent->SetChild(nullptr);
+	}
+	if (par) {
+		State = TRm;
+	}
+	else State = ORPH;
+	if (Child) {
+		Child->SetChildState(false);
+	}
 }
 Processor* Process::GetProcessor() const {
 	return RunProcessor;
