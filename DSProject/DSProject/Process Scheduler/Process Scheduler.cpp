@@ -31,6 +31,49 @@ void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR) {
 		MultiProcessor[cnt++] = new RR(this, TSR);
 	}
 }
+
+void Scheduler::WriteData() {
+	pOut->PrintOut("Enter a name for output file : ");
+	pIn->GetFileName(Filename);
+	OutFile.open(Filename + ".txt");
+	OutFile << "TT\tPID\tAT\tCT\tIO_D\tWT\tRT\tTRT\n";
+	Process* p = nullptr;
+	Queue<Process*> TRMT = TRM;
+	int AvgResponseTime = 0, AvgWaitingTime = 0,AvgTurnAroundTime=0;
+	double AvgUtil = 0;
+	while (TRMT.dequeue(p)) {
+		p->PrintOutFile(OutFile);
+		AvgResponseTime += p->GetResponseTime();
+		AvgWaitingTime += p->GetWaitingTime();
+		AvgTurnAroundTime += p->GetTurnAroundDuration();
+	}
+	AvgResponseTime /= TRM.GetSize();
+	AvgWaitingTime /= TRM.GetSize();
+	AvgTurnAroundTime /= TRM.GetSize();
+	OutFile << "Processes : " << TRM.GetSize() << '\n'
+		<<"Avg WT = "<<AvgWaitingTime<<",\t\tAvg RT = "<<AvgResponseTime<<
+		",\t\tAvgTRT = "<<AvgTurnAroundTime<<'\n';
+	//////// Migration Calculations Remained
+	
+	OutFile << "Processors: " << Num_of_Processors << " [" << NF << " FCFS, " 
+		<< NS << " SJF, " << NR << " RR]\n";
+	OutFile << "Processors Load\n";
+	for (int i = 0; i < Num_of_Processors; i++) {
+		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pLoad() * 100 << "%";
+		if (i != Num_of_Processors - 1)
+			OutFile << ",\t";
+	}
+	OutFile << "\n\nProcessors Utiliz\n";
+	for (int i = 0; i < Num_of_Processors; i++) {
+		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pUtil() * 100 << "%";
+		AvgUtil += MultiProcessor[i]->Get_pUtil();
+		if (i != Num_of_Processors - 1)
+			OutFile << ",\t";
+	}
+	AvgUtil /= Num_of_Processors;
+	OutFile << "Avg Utilization = " << AvgUtil * 100 << "%\n";
+}
+
 void Scheduler::Get_Data() {
 	int TSR = 0;
 	pIn->GetFileName(Filename);
@@ -38,16 +81,18 @@ void Scheduler::Get_Data() {
 	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> M;
 	IDs = new int[M];
 	for (int i = 0; i < M; i++) {
-		int AT, ID, CPU, N, IO_R, IO_D;
+		int AT, ID, CPU, N, IO_R, IO_D,sum_IOD=0;
 		InFile >> AT >> ID >> CPU >> N;
 		Process* process = new Process(AT, ID, CPU);
 		IDs[i] = ID;
 		while (N--) {
 			char dummy;
 			InFile >> dummy >> IO_R >> dummy >> IO_D >> dummy;
+			sum_IOD += IO_D;
 			if (N) InFile >> dummy;
 			process->AddIO(IO_R, IO_D);
 		}
+		process->SetTIOD(sum_IOD);
 		NEW.enqueue(process);
 	}
 	AddProcessors(NF, NS, NR, TSR);

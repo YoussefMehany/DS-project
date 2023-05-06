@@ -3,21 +3,34 @@
 
 
 RR::RR(Scheduler* Sched, int tsr)
-	:Processor(Sched), TSR(tsr) {}
+	:Processor(Sched), TSR(tsr),TSRTemp(tsr) {}
 void RR::ScheduleAlgo() {
-	Process* process = nullptr;
-	if (State == IDLE && RDY_LIST.dequeue(process)) {
+	if (State == IDLE && RDY_LIST.dequeue(R)) {
+		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());  // This Line and the next one should be added to all processors  
+		R->SetLastRunTime(S->Get_TimeStep());
 		State = BUSY;
-		R = process;
+		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 		R->SetState(RUn);
-		process->SetProcessor(this);
+		R->SetProcessor(this);
+		QFT -= min(R->GetCPURemainingTime(),TSR);
 	}
 	if (State == BUSY) {
+		TSRTemp--;
 		TBT++;
+		R->UpdateInfo();
+		if (!R->GetCPURemainingTime()) {
+			S->TO_TRM(R);
+		}
+		else if (R->GetIO() && !R->GetIO()->getFirst())
+			S->TO_BLK(R);
+		else if(!TSRTemp) {
+			RDY_LIST.enqueue(R);
+			TSRTemp = TSR;
+			RDY_LIST.peek(R);
+			UpdateState();
+		}
 	}
-	else {
-		TIT++;
-	}
+	else TIT++;
 }
 void RR::AddProcess(Process* process) {
 	UpdateState();

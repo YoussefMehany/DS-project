@@ -13,6 +13,7 @@
 class Scheduler
 {
 	ifstream InFile;
+	ofstream OutFile;
 	string Filename;
 	Input* pIn;
 	Output* pOut;
@@ -29,6 +30,7 @@ class Scheduler
 public:
 	Scheduler();
 	void Get_Data(); //Get Data from the input file
+	void WriteData();
 	void Set_Mode(InterfaceMode mode);
 	void AddProcessors(int FCFCcnt, int SJFcnt, int RRcnt,int TSR);
 	void TO_RDY(Process* P, int& i); //Move to RDY List

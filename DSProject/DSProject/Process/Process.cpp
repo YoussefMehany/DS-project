@@ -1,5 +1,5 @@
 #include "Process.h"
-
+#include <fstream>
 int Process::TTAT = 0;
 Process::Process() {
 	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = LastRunTime = CurrWaitingTime = 0;
@@ -10,6 +10,7 @@ Process::Process() {
 Process::Process(int ArrivalTime, int PID, int CPUTime) {
 	this->ArrivalTime = ArrivalTime;
 	this->CPUTime = CPUTime;
+	CPUTemp = CPUTime;
 	TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
 	this->PID = PID;
 	State = NEW;
@@ -42,6 +43,13 @@ int Process::GetTurnAroundDuration()const {
 }
 int Process::GetWaitingTime()const {
 	return WaitingTime;
+}
+int Process::GetTIOD()const
+{
+	return TIOD;
+}
+int Process::GetCPURemainingTime()const {
+	return CPUTemp;
 }
 Pair<int, int>* Process::GetIO() {
 	Pair<int, int>* IO = nullptr;
@@ -97,8 +105,11 @@ void Process::AddWaitingTime(int Time) {
 void Process::SetLastRunTime(int Time) {
 	LastRunTime = Time;
 }
+void Process::SetTIOD(int TIOD) {
+	this->TIOD = TIOD;
+}
 void Process::UpdateInfo() {
-	if (CPUTime) CPUTime--;
+	if (CPUTemp) CPUTemp--;
 
 	Pair<int, int>* IO = nullptr;
 	IO_LIST.peek(IO);
@@ -124,4 +135,10 @@ ostream& operator<<(ostream& out, const Process& process)
 {
 	out << process.PID;
 	return out;
+}
+void Process::PrintOutFile(ofstream& out)
+{
+	out << TerminationTime << '\t' << PID << '\t' << ArrivalTime << '\t' <<
+		CPUTime << '\t'<<TIOD<<'\t'<<WaitingTime<<'\t'<<ResponseTime<<'\t'<<TurnAroundDuration
+		<<'\n';
 }

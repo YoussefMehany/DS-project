@@ -2,7 +2,7 @@
 #include "Processor.h"
 
 class RR : public Processor {
-	int TSR;
+	int TSR,TSRTemp;
 	Queue<Process*> RDY_LIST;
 public:
 	RR(Scheduler* Sched,int tsr);

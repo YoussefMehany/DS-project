@@ -10,9 +10,10 @@ private:
 	Queue<Pair<int, int>*> IO_LIST; //Queue or Pri ? not specified in the document
 	static int counter, TTAT;
 	int PID;
+	int TIOD; // Total IO Duration
 	int ArrivalTime;
 	int ResponseTime;
-	int CPUTime;
+	int CPUTime,CPUTemp;
 	int TerminationTime;
 	int TurnAroundDuration;
 	int WaitingTime;
@@ -28,12 +29,14 @@ public:
 	int GetPID()const;
 	int GetArrivalTime()const;
 	int GetCPUTime()const;
+	int GetTIOD()const;
 	int GetTerminationTime()const;
 	int GetResponseTime()const;
 	int GetTurnAroundDuration()const;
 	int GetWaitingTime()const;
 	int GetCurrWaitingTime()const;
 	int GetLastRunTime()const;
+	int GetCPURemainingTime()const;
 	Pair<int, int>* GetIO();
 	Process* GetChild()const;
 	Process* GetParent()const;
@@ -44,6 +47,7 @@ public:
 	void SetTerminationTime(int TerminationTime);
 	void SetResponseTime(int FirstTime);
 	void SetTurnAroundDuration();
+	void SetTIOD(int TIOD);
 	void SetWaitingTime();
 	void SetState(ProcessState state);
 	void SetProcessor(Processor* processor);
@@ -52,6 +56,7 @@ public:
 	void AddIO(int IO_R, int IO_D);	
 	void UpdateInfo();
 	void SetChildState(bool par = true);
+	void PrintOutFile(ofstream& out);
 	static int GetTTAT();
 };
 

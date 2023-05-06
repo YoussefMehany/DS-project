@@ -16,7 +16,7 @@ void FCFS::ScheduleAlgo() {
 		R->SetState(RUn);
 		R->SetProcessor(this);
 
-		QFT -= R->GetCPUTime();
+		QFT -= R->GetCPURemainingTime();
 
 		FCFSMigration(); //check for Migration Process First 
 	}
@@ -25,7 +25,7 @@ void FCFS::ScheduleAlgo() {
 		TBT++;
 		R->UpdateInfo();
 
-		if (!R->GetCPUTime()) {
+		if (!R->GetCPURemainingTime()) {
 			S->TO_TRM(R);
 			R->SetChildState(); //set children to orphans
 		}
