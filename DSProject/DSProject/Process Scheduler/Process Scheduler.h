@@ -41,9 +41,12 @@ public:
 	void UpdateInterface();	
 	void WorkStealing();
 	void FCFSMigration(Process* Migrate);
+	void RRMigration(Process* Migrate);
 	int  Get_TimeStep();
 	int  Get_MaxW() const;
+	int  Get_RTF() const;
 	int  Get_NR()  const;
+	int  Get_NS()  const;
 	Processor* GetSQ() const;
 	bool Simulation(); //Dividing the Processes on the processors
 	Input* getInput();

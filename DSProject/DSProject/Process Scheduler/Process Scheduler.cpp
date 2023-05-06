@@ -206,8 +206,14 @@ bool Scheduler::Simulation() {
 int Scheduler::Get_MaxW()const {
 	return MaxW;
 }
+int Scheduler::Get_RTF()const {
+	return RTF;
+}
 int Scheduler::Get_NR()  const {
 	return NR;
+}
+int Scheduler::Get_NS()  const {
+	return NS;
 }
 void Scheduler::FCFSMigration(Process* Migrate) {
 	Migrate->SetState(RDy);
@@ -224,6 +230,26 @@ void Scheduler::FCFSMigration(Process* Migrate) {
 	RRSQ->AddProcess(Migrate);
 }
 //////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////// RR->SJF Migration ////////////////////////////////
+
+void Scheduler::RRMigration(Process* Migrate) {
+	Migrate->SetState(RDy);
+	Migrate->GetProcessor()->UpdateState();
+	Migrate->SetProcessor(nullptr);
+	Processor* SJFSQ = nullptr; //SJF Shortest Ready Queue
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<SJF*>(MultiProcessor[i]))
+			if (!SJFSQ)
+				SJFSQ = MultiProcessor[i];
+			else if (SJFSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
+				SJFSQ = MultiProcessor[i];
+	}
+	SJFSQ->AddProcess(Migrate);
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////// WORK STEALING ////////////////////////////////
 Processor* Scheduler::GetSQ() const {

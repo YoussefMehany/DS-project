@@ -6,6 +6,7 @@ class RR : public Processor {
 	Queue<Process*> RDY_LIST;
 public:
 	RR(Scheduler* Sched,int tsr);
+	void RRMigration();
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
 	virtual void Lose(Process*& Stolen);
