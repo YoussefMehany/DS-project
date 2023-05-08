@@ -34,6 +34,7 @@ public:
 	void Set_Mode(InterfaceMode mode);
 	void AddProcessors(int FCFCcnt, int SJFcnt, int RRcnt,int TSR);
 	void TO_RDY(Process* P, int& i); //Move to RDY List
+	void TO_SHORTEST_RDY(Process* P);
 	void RET_TO_RDY(Process* P);
 	void TO_TRM(Process* P); //Move to TRM List
 	void TO_BLK(Process* P); //Move to BLK List
@@ -42,6 +43,7 @@ public:
 	void WorkStealing();
 	void FCFSMigration(Process* Migrate);
 	void RRMigration(Process* Migrate);
+	void DecideShortest();
 	Processor* DecideShortestFCFS();
 	Process* AddChildToSQ(int ArrivalT, int RemCPU);
 	int  Get_TimeStep();

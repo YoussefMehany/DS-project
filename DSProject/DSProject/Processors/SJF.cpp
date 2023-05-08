@@ -14,6 +14,12 @@ void SJF::ScheduleAlgo() {
 	}
 	if (State == BUSY) {
 		TBT++;
+		R->UpdateInfo();
+		if (!R->GetCPURemainingTime()) {
+			S->TO_TRM(R);
+		}
+		else if (R->GetIO() && !R->GetIO()->getFirst())
+			S->TO_BLK(R);
 	}
 	else {
 		TIT++;
@@ -22,7 +28,8 @@ void SJF::ScheduleAlgo() {
 void SJF::AddProcess(Process* process) {
 	UpdateState();
 	process->SetProcessor(this);
-	RDY_LIST.enqueue(process, process->GetCPUTime());
+	RDY_LIST.enqueue(process, process->GetCPURemainingTime());
+	QFT += process->GetCPURemainingTime();
 }
 void SJF::Print() {
 	Output* pOut = S->getOutput();

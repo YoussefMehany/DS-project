@@ -25,10 +25,8 @@ void RR::ScheduleAlgo() {
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
 		else if(!TSRTemp) {
-			RDY_LIST.enqueue(R);
+			S->RET_TO_RDY(R);
 			TSRTemp = TSR;
-			RDY_LIST.peek(R);
-			UpdateState();
 		}
 	}
 	else TIT++;
@@ -37,6 +35,7 @@ void RR::AddProcess(Process* process) {
 	UpdateState();
 	process->SetProcessor(this);
 	RDY_LIST.enqueue(process);
+	QFT += process->GetCPURemainingTime();
 }
 void RR::Print() {
 	Output* pOut = S->getOutput();

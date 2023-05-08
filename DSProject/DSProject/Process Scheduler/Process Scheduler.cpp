@@ -122,7 +122,7 @@ bool Scheduler::Simulation() {
 		NEW.peek(temp);
 		if (TimeStep == temp->GetArrivalTime()) {
 			NEW.dequeue(temp);
-			TO_RDY(temp, Turn);
+			TO_SHORTEST_RDY(temp);
 		}
 		else break;
 	}
@@ -253,6 +253,19 @@ void Scheduler::WorkStealing() {
 	}
 }
 
+void Scheduler::DecideShortest() {
+	int CPU_Min = INT_MAX;
+	int index;
+	for (int i = 0; i < Num_of_Processors; i++) {
+		int QFT = MultiProcessor[i]->GET_QFT();
+		if (QFT < CPU_Min) {
+			index = i;
+			CPU_Min = QFT;
+		}
+	}
+	SQ = MultiProcessor[index];
+}
+
 Processor* Scheduler::DecideShortestFCFS() {
 	int CPU_Min = INT_MAX;
 	int index = 0;
@@ -298,6 +311,11 @@ void Scheduler::TO_RDY(Process* P, int& i) {
 	P->SetState(RDy);
 	MultiProcessor[i]->AddProcess(P);
 	i = (i + 1) % Num_of_Processors;
+}
+void Scheduler::TO_SHORTEST_RDY(Process* P) {
+	P->SetState(RDy);
+	DecideShortest();
+	SQ->AddProcess(P);
 }
 void Scheduler::SchedulerUpdater(Processor* P) {
 	P->UpdateState();

@@ -58,7 +58,7 @@ void FCFS::AddProcess(Process* process) {
 	UpdateState();
 	process->SetProcessor(this);
 	RDY_LIST.InsertEnd(process);
-	QFT += process->GetCPUTime();
+	QFT += process->GetCPURemainingTime();
 }
 void FCFS::Print() {
 	Output* pOut = S->getOutput();
