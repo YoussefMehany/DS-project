@@ -81,9 +81,9 @@ void Scheduler::Get_Data() {
 	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> M;
 	IDs = new int[M];
 	for (int i = 0; i < M; i++) {
-		int AT, ID, CPU, N, IO_R, IO_D,sum_IOD=0;
+		int AT, ID, CPU, N, IO_R, IO_D,sum_IOD = 0;
 		InFile >> AT >> ID >> CPU >> N;
-		Process* process = new Process(AT, ID, CPU);
+		Process* process = new Process(AT, CPU, ID);
 		IDs[i] = ID;
 		while (N--) {
 			char dummy;
@@ -127,7 +127,6 @@ bool Scheduler::Simulation() {
 		else break;
 	}
 
-	
 
 	////////////////////////////////// KILLSIG //////////////////////////////////////
 
@@ -141,8 +140,13 @@ bool Scheduler::Simulation() {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////
-
+	///////////////////////////////// Forking /////////////////////////////////////
+	
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<FCFS*>(MultiProcessor[i]))  //Check Fork_Prob and add children
+			((FCFS*)MultiProcessor[i])->Forking();
+	}
+	
 
 	/////////////////////////////////// WORK STEALING ///////////////////////////////
 
@@ -157,47 +161,13 @@ bool Scheduler::Simulation() {
 	}
 
 
-	/////////////////////////////////// Forking ///////////////////////////////
+	/////////////////////////////////// Remove Orphans ///////////////////////////////
 
 	for (int i = 0; i < Num_of_Processors; i++) {
 		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
 			((FCFS*)MultiProcessor[i])->RemoveOrphans();
 		}
 	}
-
-
-	//int Rand = 0;
-	//for (int i = 0; i < Num_of_Processors; i++) {
-	//	if (MultiProcessor[i]->Get_State() == BUSY) {
-	//		Rand = 1 + rand() % 100;
-	//		Process* process = MultiProcessor[i]->Get_Run();
-	//		if (Rand <= 15) {
-	//			TO_BLK(process);
-	//			SchedulerUpdater(MultiProcessor[i]);
-	//		}
-	//		else if (Rand >= 20 && Rand <= 30) {
-	//			RET_TO_RDY(process);
-	//		}
-	//		else if (Rand >= 50 && Rand <= 60) {
-	//			TO_TRM(process);
-	//			SchedulerUpdater(MultiProcessor[i]);
-	//		}
-	//	}
-	//}
-
-	//Rand = 1 + rand() % 100;
-	//if (Rand < 10) {
-	//	Process* Curr = nullptr;
-	//	if (BLK.peek(Curr)) {
-	//		BLK.dequeue(Curr);
-	//		TO_RDY(Curr, Turn);
-	//	}
-	//}
-	//Rand = rand() % M;
-	//for (int i = 0; i < Num_of_Processors; i++) {    //KILL Random process from FCFS
-	//	if (dynamic_cast<FCFS*>(MultiProcessor[i]))
-	//		((FCFS*)MultiProcessor[i])->Kill(IDs[Rand]);
-	//}
 
 	return true;
 }
@@ -208,6 +178,9 @@ int Scheduler::Get_MaxW()const {
 }
 int Scheduler::Get_RTF()const {
 	return RTF;
+}
+int Scheduler::Get_FP() const {
+	return Fork_Prob;
 }
 int Scheduler::Get_NR()  const {
 	return NR;
@@ -280,6 +253,27 @@ void Scheduler::WorkStealing() {
 	}
 }
 
+Processor* Scheduler::DecideShortestFCFS() {
+	int CPU_Min = INT_MAX;
+	int index = 0;
+	for (int i = 0; i < Num_of_Processors; i++) {
+		int QFT = INT_MAX;
+		if(dynamic_cast<FCFS*>(MultiProcessor[i]))
+			QFT = MultiProcessor[i]->GET_QFT();
+		if (QFT < CPU_Min) {
+			index = i;
+			CPU_Min = QFT;
+		}
+	}
+	return MultiProcessor[index];
+}
+
+Process* Scheduler::AddChildToSQ(int ArrivalT, int RemCPU) {
+	Process* child = new Process(ArrivalT, RemCPU);
+	DecideShortestFCFS()->AddProcess(child);
+	M++;
+	return child;
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 void Scheduler::TO_BLK(Process* P) {

@@ -26,8 +26,8 @@ void FCFS::ScheduleAlgo() {
 		R->UpdateInfo();
 
 		if (!R->GetCPURemainingTime()) {
+			R->SetChildrenState(); //set children to orphans
 			S->TO_TRM(R);
-			R->SetChildState(); //set children to orphans
 		}
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
@@ -37,13 +37,19 @@ void FCFS::ScheduleAlgo() {
 }
 
 void FCFS::RemoveOrphans() {
+
+	if (R && R->GetState() == ORPH) {
+		S->TO_TRM(R);
+		QFT -= R->GetCPUTime();
+	}
 	for (int i = 0; i < RDY_LIST.size(); i++) {
 		Process* p = nullptr;
 		RDY_LIST.GetItem(i, p);
 		if (p->GetState() == ORPH) {
 			S->TO_TRM(p);
 			RDY_LIST.Remove(i, p);
-			//QFT -= p->GetCPUTime(); need to discuss
+			QFT -= p->GetCPUTime(); //need to discuss
+			p->SetState(TRm);
 		}
 	}
 }
@@ -63,6 +69,7 @@ void FCFS::Print() {
 void FCFS::Kill(int PID) {
 	Process* p = nullptr;
 	if (State == BUSY && R->GetPID() == PID) {
+		R->SetChildrenState();
 		S->TO_TRM(R);
 		return;
 	}
@@ -78,7 +85,9 @@ void FCFS::Kill(int PID) {
 }
 
 void FCFS::FCFSMigration() {
-
+	/// <question>
+	/// shouldn't we check if its in the fork tree and not just that it has no parent.. ?
+	/// </question>
 	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
 		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
 
@@ -96,6 +105,19 @@ void FCFS::FCFSMigration() {
 	}
 }
 
+void FCFS::Forking() {
+	int FP = S->Get_FP();
+	int Rand = 1 + rand() % 100;
+	if (R && Rand <= FP && (!R->GetLeftChild() && !R->GetRightChild())) {
+		Process* child = S->AddChildToSQ(R->GetArrivalTime(), R->GetCPURemainingTime());
+		if (!R->GetLeftChild()) {
+			R->SetLeftChild(child);
+		}
+		else if (!R->GetRightChild()) {
+			R->SetRightChild(child);
+		}
+	}
+}
 void FCFS::Lose(Process*& Stolen) {
 
 	if ( ( RDY_LIST.head()->GetParent() && !dynamic_cast<FCFS*>(S->GetSQ()) ) || !RDY_LIST.RemoveHead(Stolen)) Stolen = nullptr;

@@ -42,8 +42,11 @@ public:
 	void WorkStealing();
 	void FCFSMigration(Process* Migrate);
 	void RRMigration(Process* Migrate);
+	Processor* DecideShortestFCFS();
+	Process* AddChildToSQ(int ArrivalT, int RemCPU);
 	int  Get_TimeStep();
 	int  Get_MaxW() const;
+	int Get_FP() const;
 	int  Get_RTF() const;
 	int  Get_NR()  const;
 	int  Get_NS()  const;

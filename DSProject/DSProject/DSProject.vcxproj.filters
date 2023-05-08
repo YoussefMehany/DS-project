@@ -65,6 +65,9 @@
     <ClInclude Include="Data Structures\Pair.h">
       <Filter>Data Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Data Structures\TreeNode.h">
+      <Filter>Data Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Process\Process.cpp">

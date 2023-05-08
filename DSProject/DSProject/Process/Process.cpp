@@ -1,20 +1,27 @@
 #include "Process.h"
 #include <fstream>
 int Process::TTAT = 0;
+int Process::LastID = 0;
 Process::Process() {
 	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = LastRunTime = CurrWaitingTime = 0;
 	State = NEW;
-	Parent = Child = nullptr;
+	Parent = Lchild = Rchild = nullptr;
 	RunProcessor = nullptr;
 }
-Process::Process(int ArrivalTime, int PID, int CPUTime) {
+Process::Process(int ArrivalTime, int CPUTime, int PID) {
 	this->ArrivalTime = ArrivalTime;
 	this->CPUTime = CPUTime;
 	CPUTemp = CPUTime;
 	TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
-	this->PID = PID;
+	if (~PID) {
+		this->PID = PID;
+		LastID = PID;
+	}
+	else {
+		this->PID = ++LastID;
+	}
 	State = NEW;
-	Child = nullptr;
+	Lchild = Rchild = Parent = nullptr;
 	RunProcessor = nullptr;
 }
 int Process::GetCurrWaitingTime()const {
@@ -56,8 +63,11 @@ Pair<int, int>* Process::GetIO() {
 	IO_LIST.peek(IO);
 	return IO;
 }
-Process* Process::GetChild()const {
-	return Child;
+Process* Process::GetLeftChild()const {
+	return Lchild;
+}
+Process* Process::GetRightChild()const {
+	return Rchild;
 }
 Process* Process::GetParent()const {
 	return Parent;
@@ -91,10 +101,17 @@ void Process::SetState(ProcessState state) {
 void Process::SetProcessor(Processor* processor) {
 	RunProcessor = processor;
 }
-void Process::SetChild(Process* child) {
-	if(child) 
-		child->SetParent(this);
-	Child = child;
+void Process::SetLeftChild(Process* child) {
+	if (child) {
+		child->Parent = this;
+	}
+	Lchild = child;
+}
+void Process::SetRightChild(Process* child) {
+	if (child) {
+		child->Parent = this;
+	}
+	Rchild = child;
 }
 void Process::SetParent(Process* parent) {
 	Parent = parent;
@@ -116,16 +133,19 @@ void Process::UpdateInfo() {
 	if (IO && IO->getFirst())
 		IO->SetFirst(IO->getFirst() - 1);
 }
-void Process::SetChildState(bool par) { //to set all children states to be orphans
+void Process::SetChildrenState(bool par) { //to set all children states to be orphans
 	if (Parent) {
-		Parent->SetChild(nullptr);
+		(Parent->Lchild && Parent->Lchild == this ? Parent->Lchild : Parent->Rchild) = nullptr;
 	}
 	if (par) {
 		State = TRm;
 	}
 	else State = ORPH;
-	if (Child) {
-		Child->SetChildState(false);
+	if (Lchild) {
+		Lchild->SetChildrenState(false);
+	}
+	if (Rchild) {
+		Rchild->SetChildrenState(false);
 	}
 }
 Processor* Process::GetProcessor() const {

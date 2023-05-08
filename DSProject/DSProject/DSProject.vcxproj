@@ -25,6 +25,7 @@
     <ClInclude Include="Data Structures\Pair.h" />
     <ClInclude Include="Data Structures\Pri_Node.h" />
     <ClInclude Include="Data Structures\Pri_Queue.h" />
+    <ClInclude Include="Data Structures\TreeNode.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Process Scheduler\Process Scheduler.h" />
     <ClInclude Include="Processors\FCFS.h" />
