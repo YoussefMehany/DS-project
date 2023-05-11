@@ -53,6 +53,7 @@ public:
 	int  Get_NS()  const;
 	Processor* GetSQ() const;
 	bool Simulation(); //Dividing the Processes on the processors
+	bool MakeIO(Process* Block);
 	Input* getInput();
 	Output* getOutput();
 	~Scheduler();

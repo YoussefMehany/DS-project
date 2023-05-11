@@ -10,8 +10,8 @@ void RR::ScheduleAlgo() {
 		State = BUSY;
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 		R->SetState(RUn);
-		RRMigration();
 		QFT -= R->GetCPURemainingTime();
+		RRMigration();
 	}
 	if (State == BUSY) {
 		TSRTemp--;
@@ -57,14 +57,13 @@ void RR::Lose(Process*& Stolen) {
 void RR::RRMigration() {
 
 	if (S->Get_NS()) { //Don't enter if no SJF exists 
-		while (R->GetCPURemainingTime() < S->Get_RTF()) { //Migrate Multiple Processes in the same time step until a process have Remaining Time less than RTF
+		while (R->GetCPURemainingTime() < S->Get_RTF()) { //Migrate Multiple Processes in the same time step until a process has Remaining Time less than RTF
 			
-			QFT -= R->GetCPURemainingTime();
-
 			S->RRMigration(R);
 
 			if (RDY_LIST.dequeue(R)) {
 				State = BUSY;
+				QFT -= R->GetCPURemainingTime();
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 				R->SetState(RUn);
 				R->SetProcessor(this);

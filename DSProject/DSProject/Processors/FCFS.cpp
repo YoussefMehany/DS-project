@@ -83,7 +83,7 @@ void FCFS::Kill(int PID) {
 		RDY_LIST.GetItem(i, p);
 		if (p->GetPID() == PID) {
 			RDY_LIST.Remove(i, p);
-			QFT -= p->GetCPUTime();
+			QFT -= p->GetCPURemainingTime();
 			S->TO_TRM(p);
 			return;
 		}
@@ -103,7 +103,7 @@ void FCFS::FCFSMigration() {
 				State = BUSY;
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 				R->SetState(RUn);
-				QFT -= R->GetCPUTime();
+				QFT -= R->GetCPURemainingTime();
 			}
 			else { State = IDLE; break; }
 		}

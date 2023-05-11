@@ -115,7 +115,7 @@ bool Scheduler::Simulation() {
 
 	TimeStep++;
 
-	if (TRM.GetSize() + BLK.GetSize() == M) /// Have to be modified when BLK operations are Done
+	if (TRM.GetSize() == M) /// Have to be modified when BLK operations are Done
 		return false;
 
 	while (!NEW.isEmpty()) {
@@ -161,6 +161,16 @@ bool Scheduler::Simulation() {
 		MultiProcessor[i]->ScheduleAlgo();
 	}
 
+	/////////////////////////////////// Perform IO tasks ///////////////////////////////
+
+	int BlkSize = BLK.GetSize();
+	while (BlkSize--) {
+		Process* Blocked = nullptr;
+		BLK.dequeue(Blocked);
+		if (MakeIO(Blocked)) {
+			BLK.enqueue(Blocked);
+		}
+	}
 
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
 
@@ -254,7 +264,18 @@ void Scheduler::WorkStealing() {
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////IO_TASKS//////////////////////////////////////
+bool Scheduler::MakeIO(Process* Blocked) {
+	int Remaining = Blocked->GetIO()->getSecond();
+	if (Remaining) {
+		Blocked->GetIO()->SetSecond(--Remaining);
+	}
+	if (!Remaining) {
+		TO_SHORTEST_RDY(Blocked);
+	}
+	return Remaining;
+}
+
 
 void Scheduler::DecideShortest() {
 	int CPU_Min = INT_MAX;
