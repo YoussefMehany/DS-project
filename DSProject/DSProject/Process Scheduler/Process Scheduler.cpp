@@ -163,12 +163,12 @@ bool Scheduler::Simulation() {
 
 	/////////////////////////////////// Perform IO tasks ///////////////////////////////
 
-	int BlkSize = BLK.GetSize();
-	while (BlkSize--) {
-		Process* Blocked = nullptr;
-		BLK.dequeue(Blocked);
-		if (MakeIO(Blocked)) {
-			BLK.enqueue(Blocked);
+	Process* Blocked = nullptr;
+	if(BLK.peek(Blocked)) {
+		if (!MakeIO(Blocked)) {
+			BLK.dequeue(Blocked);
+			Blocked->NextIO();
+			TO_SHORTEST_RDY(Blocked);
 		}
 	}
 
@@ -269,9 +269,6 @@ bool Scheduler::MakeIO(Process* Blocked) {
 	int Remaining = Blocked->GetIO()->getSecond();
 	if (Remaining) {
 		Blocked->GetIO()->SetSecond(--Remaining);
-	}
-	if (!Remaining) {
-		TO_SHORTEST_RDY(Blocked);
 	}
 	return Remaining;
 }

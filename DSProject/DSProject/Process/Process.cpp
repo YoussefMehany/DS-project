@@ -64,6 +64,10 @@ Pair<int, int>* Process::GetIO() {
 	IO_LIST.peek(IO);
 	return IO;
 }
+void Process::NextIO() {
+	Pair<int, int>* IO = nullptr;
+	IO_LIST.dequeue(IO);
+}
 Process* Process::GetLeftChild()const {
 	return Lchild;
 }

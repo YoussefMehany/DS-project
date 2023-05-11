@@ -57,6 +57,7 @@ public:
 	void SetRightChild(Process* child);
 	void SetParent(Process* parent);
 	void AddIO(int IO_R, int IO_D);	
+	void NextIO();
 	void UpdateInfo();
 	void SetChildrenState(bool par = true);
 	void PrintOutFile(ofstream& out);
