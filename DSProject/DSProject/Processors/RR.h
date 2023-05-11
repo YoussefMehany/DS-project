@@ -4,6 +4,7 @@
 class RR : public Processor {
 	int TSR,TSRTemp;
 	Queue<Process*> RDY_LIST;
+	void Round();
 public:
 	RR(Scheduler* Sched,int tsr);
 	void RRMigration();

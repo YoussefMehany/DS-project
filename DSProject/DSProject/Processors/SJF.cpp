@@ -5,12 +5,16 @@
 SJF::SJF(Scheduler* Sched)
 	:Processor(Sched) {}
 void SJF::ScheduleAlgo() {
-	Process* process = nullptr;
-	if (State == IDLE && RDY_LIST.dequeue(process)) {
+	
+	if (State == IDLE && RDY_LIST.dequeue(R)) {
+		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());
+
+        if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+
 		State = BUSY;
-		R = process;
+	
 		R->SetState(RUn);
-		process->SetProcessor(this);
+		QFT -= R->GetCPURemainingTime();
 	}
 	if (State == BUSY) {
 		TBT++;
@@ -21,9 +25,8 @@ void SJF::ScheduleAlgo() {
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
 	}
-	else {
-		TIT++;
-	}
+	else TIT++;
+
 }
 void SJF::AddProcess(Process* process) {
 	UpdateState();
@@ -38,6 +41,6 @@ void SJF::Print() {
 	RDY_LIST.Print();
 }
 void SJF::Lose(Process*& Stolen) {
-	if (!RDY_LIST.dequeue(Stolen)) Stolen = nullptr;
-	else QFT -= Stolen->GetCPUTime();
+	RDY_LIST.dequeue(Stolen);
+	QFT -= Stolen->GetCPURemainingTime();
 }

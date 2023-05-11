@@ -3,7 +3,8 @@
 int Process::TTAT = 0;
 int Process::LastID = 0;
 Process::Process() {
-	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = LastRunTime = CurrWaitingTime = 0;
+	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime =  CurrWaitingTime = 0;
+	LastRunTime = 1;
 	State = NEW;
 	Parent = Lchild = Rchild = nullptr;
 	RunProcessor = nullptr;

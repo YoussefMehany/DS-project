@@ -9,13 +9,11 @@ void FCFS::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.RemoveHead(R)) {
 
 		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());  // This Line and the next one should be added to all processors  
-		R->SetLastRunTime(S->Get_TimeStep());
 
 		State = BUSY;
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 		R->SetState(RUn);
-		R->SetProcessor(this);
-
+		
 		QFT -= R->GetCPURemainingTime();
 
 		FCFSMigration(); //check for Migration Process First 
@@ -39,17 +37,25 @@ void FCFS::ScheduleAlgo() {
 void FCFS::RemoveOrphans() {
 
 	if (R && R->GetState() == ORPH) {
+
+		QFT -= R->GetCPURemainingTime();
+
 		S->TO_TRM(R);
-		QFT -= R->GetCPUTime();
 	}
 	for (int i = 0; i < RDY_LIST.size(); i++) {
+
 		Process* p = nullptr;
+
 		RDY_LIST.GetItem(i, p);
+
 		if (p->GetState() == ORPH) {
-			S->TO_TRM(p);
+
+			QFT -= p->GetCPURemainingTime(); //need to discuss
+
 			RDY_LIST.Remove(i, p);
-			QFT -= p->GetCPUTime(); //need to discuss
-			p->SetState(TRm);
+
+			S->TO_TRM(p);
+
 		}
 	}
 }
@@ -97,7 +103,6 @@ void FCFS::FCFSMigration() {
 				State = BUSY;
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 				R->SetState(RUn);
-				R->SetProcessor(this);
 				QFT -= R->GetCPUTime();
 			}
 			else { State = IDLE; break; }
@@ -118,9 +123,23 @@ void FCFS::Forking() {
 		}
 	}
 }
-void FCFS::Lose(Process*& Stolen) {
 
-	if ( ( RDY_LIST.head()->GetParent() && !dynamic_cast<FCFS*>(S->GetSQ()) ) || !RDY_LIST.RemoveHead(Stolen)) Stolen = nullptr;
-	else QFT -= Stolen->GetCPUTime();
+void FCFS::Lose(Process*& Stolen) {
+	Process* p = nullptr;
+
+	for (int i = 0; i < RDY_LIST.size(); i++) {
+
+		RDY_LIST.GetItem(i, p);
+
+		if (!p->GetParent()) {
+
+			RDY_LIST.Remove(i, p);
+
+			QFT -= p->GetCPURemainingTime();
+
+			Stolen = p;
+
+		}
+	}
 
 }

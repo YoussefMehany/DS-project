@@ -39,7 +39,7 @@ void Scheduler::WriteData() {
 	OutFile << "TT\tPID\tAT\tCT\tIO_D\tWT\tRT\tTRT\n";
 	Process* p = nullptr;
 	Queue<Process*> TRMT = TRM;
-	int AvgResponseTime = 0, AvgWaitingTime = 0,AvgTurnAroundTime=0;
+	int AvgResponseTime = 0, AvgWaitingTime = 0, AvgTurnAroundTime = 0;
 	double AvgUtil = 0;
 	while (TRMT.dequeue(p)) {
 		p->PrintOutFile(OutFile);
@@ -51,11 +51,11 @@ void Scheduler::WriteData() {
 	AvgWaitingTime /= TRM.GetSize();
 	AvgTurnAroundTime /= TRM.GetSize();
 	OutFile << "Processes : " << TRM.GetSize() << '\n'
-		<<"Avg WT = "<<AvgWaitingTime<<",\t\tAvg RT = "<<AvgResponseTime<<
-		",\t\tAvgTRT = "<<AvgTurnAroundTime<<'\n';
+		<< "Avg WT = " << AvgWaitingTime << ",\t\tAvg RT = " << AvgResponseTime <<
+		",\t\tAvgTRT = " << AvgTurnAroundTime << '\n';
 	//////// Migration Calculations Remained
-	
-	OutFile << "Processors: " << Num_of_Processors << " [" << NF << " FCFS, " 
+
+	OutFile << "Processors: " << Num_of_Processors << " [" << NF << " FCFS, "
 		<< NS << " SJF, " << NR << " RR]\n";
 	OutFile << "Processors Load\n";
 	for (int i = 0; i < Num_of_Processors; i++) {
@@ -81,7 +81,7 @@ void Scheduler::Get_Data() {
 	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> M;
 	IDs = new int[M];
 	for (int i = 0; i < M; i++) {
-		int AT, ID, CPU, N, IO_R, IO_D,sum_IOD = 0;
+		int AT, ID, CPU, N, IO_R, IO_D, sum_IOD = 0;
 		InFile >> AT >> ID >> CPU >> N;
 		Process* process = new Process(AT, CPU, ID);
 		IDs[i] = ID;
@@ -110,11 +110,12 @@ void Scheduler::Get_Data() {
 	Mode = InterfaceMode(x - 1);
 	system("CLS");
 }
+
 bool Scheduler::Simulation() {
 
 	TimeStep++;
 
-	if (TRM.GetSize() + BLK.GetSize() == M) // Have to be modified when BLK operations are Done
+	if (TRM.GetSize() + BLK.GetSize() == M) /// Have to be modified when BLK operations are Done
 		return false;
 
 	while (!NEW.isEmpty()) {
@@ -141,16 +142,16 @@ bool Scheduler::Simulation() {
 	}
 
 	///////////////////////////////// Forking /////////////////////////////////////
-	
+
 	for (int i = 0; i < Num_of_Processors; i++) {
 		if (dynamic_cast<FCFS*>(MultiProcessor[i]))  //Check Fork_Prob and add children
 			((FCFS*)MultiProcessor[i])->Forking();
 	}
-	
+
 
 	/////////////////////////////////// WORK STEALING ///////////////////////////////
 
-	if (!(TimeStep % STL))
+	if (!(TimeStep % STL) && Num_of_Processors)
 		WorkStealing();
 
 	/////////////////////////////////////////////////////////////////////////////////
@@ -253,17 +254,21 @@ void Scheduler::WorkStealing() {
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+
 void Scheduler::DecideShortest() {
 	int CPU_Min = INT_MAX;
-	int index;
-	for (int i = 0; i < Num_of_Processors; i++) {
-		int QFT = MultiProcessor[i]->GET_QFT();
-		if (QFT < CPU_Min) {
-			index = i;
-			CPU_Min = QFT;
+	int index = 0;
+	if (Num_of_Processors) {
+		for (int i = 0; i < Num_of_Processors; i++) {
+			int QFT = MultiProcessor[i]->GET_QFT();
+			if (QFT < CPU_Min) {
+				index = i;
+				CPU_Min = QFT;
+			}
 		}
+		SQ = MultiProcessor[index];
 	}
-	SQ = MultiProcessor[index];
 }
 
 Processor* Scheduler::DecideShortestFCFS() {
@@ -271,7 +276,7 @@ Processor* Scheduler::DecideShortestFCFS() {
 	int index = 0;
 	for (int i = 0; i < Num_of_Processors; i++) {
 		int QFT = INT_MAX;
-		if(dynamic_cast<FCFS*>(MultiProcessor[i]))
+		if (dynamic_cast<FCFS*>(MultiProcessor[i]))
 			QFT = MultiProcessor[i]->GET_QFT();
 		if (QFT < CPU_Min) {
 			index = i;
@@ -291,22 +296,20 @@ Process* Scheduler::AddChildToSQ(int ArrivalT, int RemCPU) {
 //////////////////////////////////////////////////////////////////////////////////
 void Scheduler::TO_BLK(Process* P) {
 	P->SetState(BLk);
+	P->SetLastRunTime(TimeStep);
 	P->GetProcessor()->UpdateState();
 	P->SetProcessor(nullptr);
 	BLK.enqueue(P);
 }
 void Scheduler::TO_TRM(Process* P) {
 	P->SetTerminationTime(TimeStep);
+	P->SetLastRunTime(TimeStep);
 	P->SetState(TRm);
 	P->GetProcessor()->UpdateState();
 	P->SetProcessor(nullptr);
 	TRM.enqueue(P);
 }
-void Scheduler::RET_TO_RDY(Process* P) {
-	P->SetState(RDy);
-	Processor* processor = P->GetProcessor();
-	processor->AddProcess(P);
-}
+
 void Scheduler::TO_RDY(Process* P, int& i) {
 	P->SetState(RDy);
 	MultiProcessor[i]->AddProcess(P);
@@ -323,12 +326,12 @@ void Scheduler::SchedulerUpdater(Processor* P) {
 		P->Get_Run()->SetProcessor(nullptr);
 }
 void Scheduler::UpdateInterface() {
-	
+
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
 			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
-		if (TRM.GetSize() + BLK.GetSize() == M)  // Have to be modified when BLK operations are Done
+		if (TRM.GetSize() + BLK.GetSize() == M)  /// Have to be modified when BLK operations are Done
 			pOut->PrintOut("Simulation ends, Output file created\n");
 	}
 	else {
@@ -337,8 +340,8 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(100);
-		if (TRM.GetSize() != M)
+		else Sleep(250);
+		if (TRM.GetSize()+ BLK.GetSize() != M)   /// Have to be modified when BLK operations are Done
 			system("CLS");
 	}
 }
