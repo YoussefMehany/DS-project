@@ -101,10 +101,12 @@ void FCFS::FCFSMigration() {
 
 			if (RDY_LIST.RemoveHead(R)) {
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+				R->SetProcessor(this);
 				R->SetState(RUn);
+				State = BUSY;
 				QFT -= R->GetCPURemainingTime();
 			}
-			else { State = IDLE; break; }
+			else break;
 		}
 	}
 }
@@ -130,7 +132,7 @@ void FCFS::Lose(Process*& Stolen) {
 
 		RDY_LIST.GetItem(i, p);
 
-		if (!p->GetParent()) {
+		if (!p->GetParent() && p->GetState() != ORPH) {
 
 			RDY_LIST.Remove(i, p);
 

@@ -75,9 +75,11 @@ void RR::RRMigration() {
 			if (RDY_LIST.dequeue(R)) {
 				QFT -= R->GetCPURemainingTime();
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+				R->SetProcessor(this);
 				R->SetState(RUn);
+				State = BUSY;
 			}
-			else { State = IDLE; break; }
+			else break;
 		}
 	}
 }

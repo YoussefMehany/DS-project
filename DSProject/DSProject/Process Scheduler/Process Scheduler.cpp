@@ -5,8 +5,9 @@
 #include "../Processors/SJF.h"
 #include <iomanip>
 #include <windows.h>
+
 Scheduler::Scheduler() {
-	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn =ProcessesMaxW= ProcessesRTF = ProcessesStolen =0;
+	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = ProcessesMaxW = ProcessesRTF = ProcessesStolen = 0;
 	MultiProcessor = nullptr;
 	IDs = nullptr;
 	LQ = SQ = nullptr;
@@ -56,11 +57,11 @@ void Scheduler::WriteData() {
 		",\t\tAvgTRT = " << AvgTurnAroundTime << '\n';
 	double forked_per = 100*(double)(M - INIT_M) / M;
 	OutFile << fixed << setprecision(3)<< "Migration %:\t\tRTF= " << 100.0*ProcessesRTF/M <<
-		",\t\tMaxW = " << 100.0*ProcessesMaxW / M <<
+		"%,\t\tMaxW = " << 100.0*ProcessesMaxW / M <<
 		"%\nWork Steal: "<< 100.0*ProcessesStolen / M <<"%\nForked Process: "<<forked_per;
 
 
-	OutFile << "\nProcessors: " << Num_of_Processors << " [" << NF << " FCFS, "
+	OutFile << "%\nProcessors: " << Num_of_Processors << " [" << NF << " FCFS, "
 		<< NS << " SJF, " << NR << " RR]\n";
 	OutFile << "Processors Load\n";
 	for (int i = 0; i < Num_of_Processors; i++) {
@@ -165,6 +166,7 @@ bool Scheduler::Simulation() {
 			((FCFS*)MultiProcessor[i])->RemoveOrphans();
 		}
 	}
+
 	///////////////////////////////// Forking /////////////////////////////////////
 
 	for (int i = 0; i < Num_of_Processors; i++) {
@@ -183,7 +185,6 @@ bool Scheduler::Simulation() {
 				((FCFS*)MultiProcessor[i])->Kill(Kill->getSecond());
 		}
 	}
-
 
 	return true;
 }
@@ -348,12 +349,15 @@ void Scheduler::TO_SHORTEST_RDY(Process* P) {
 
 void Scheduler::UpdateInterface() {
 
+	if (TRM.GetSize() == M) {
+		pOut->PrintOut("Simulation ends, Output file is created\n");
+		return;
+	}
+
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
 			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
-		if (TRM.GetSize() == M)
-			pOut->PrintOut("Simulation ends, Output file is created\n");
 	}
 	else {
 		cout << M << endl;
