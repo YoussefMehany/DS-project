@@ -115,7 +115,7 @@ bool Scheduler::Simulation() {
 
 	TimeStep++;
 
-	if (TRM.GetSize() == M) /// Have to be modified when BLK operations are Done
+	if (TRM.GetSize() == M)
 		return false;
 
 	while (!NEW.isEmpty()) {
@@ -173,6 +173,9 @@ bool Scheduler::Simulation() {
 	}
 
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
+
+
+
 
 	for (int i = 0; i < Num_of_Processors; i++) {
 		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
@@ -349,17 +352,18 @@ void Scheduler::UpdateInterface() {
 	{
 		if (TimeStep == 1)
 			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
-		if (TRM.GetSize() + BLK.GetSize() == M)  /// Have to be modified when BLK operations are Done
+		if (TRM.GetSize() == M)
 			pOut->PrintOut("Simulation ends, Output file created\n");
 	}
 	else {
+		cout << M << endl;
 		pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
 		if (Mode == Interactive) {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
 		else Sleep(250);
-		if (TRM.GetSize()+ BLK.GetSize() != M)   /// Have to be modified when BLK operations are Done
+		if (TRM.GetSize() != M)
 			system("CLS");
 	}
 }
