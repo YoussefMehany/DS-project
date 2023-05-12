@@ -6,5 +6,6 @@ int main()
 	scheduler.UpdateInterface();
 	while (scheduler.Simulation())
 		scheduler.UpdateInterface();
+	scheduler.WriteData();
 	return 0;
 }

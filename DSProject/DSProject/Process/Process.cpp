@@ -98,7 +98,7 @@ int Process::GetTTAT() {
 	return TTAT;
 }
 void Process::SetWaitingTime() {
-	WaitingTime = TurnAroundDuration - CPUTime;
+	  WaitingTime =  TurnAroundDuration -( (!CPUTemp) ? CPUTime : CPUTime-CPUTemp);
 }
 void Process::SetState(ProcessState state) {
 	State = state;

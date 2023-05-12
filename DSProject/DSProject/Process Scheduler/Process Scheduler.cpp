@@ -3,9 +3,10 @@
 #include "../Processors/FCFS.h"
 #include "../Processors/RR.h"
 #include "../Processors/SJF.h"
+#include <iomanip>
 #include <windows.h>
 Scheduler::Scheduler() {
-	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = 0;
+	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn =ProcessesMaxW= ProcessesRTF = ProcessesStolen =0;
 	MultiProcessor = nullptr;
 	IDs = nullptr;
 	LQ = SQ = nullptr;
@@ -53,34 +54,40 @@ void Scheduler::WriteData() {
 	OutFile << "Processes : " << TRM.GetSize() << '\n'
 		<< "Avg WT = " << AvgWaitingTime << ",\t\tAvg RT = " << AvgResponseTime <<
 		",\t\tAvgTRT = " << AvgTurnAroundTime << '\n';
-	//////// Migration Calculations Remained
+	double forked_per = 100*(double)(M - INIT_M) / M;
+	OutFile << fixed << setprecision(3)<< "Migration %:\t\tRTF= " << 100.0*ProcessesRTF/M <<
+		",\t\tMaxW = " << 100.0*ProcessesMaxW / M <<
+		"%\nWork Steal: "<< 100.0*ProcessesStolen / M <<"%\nForked Process: "<<forked_per;
 
-	OutFile << "Processors: " << Num_of_Processors << " [" << NF << " FCFS, "
+
+	OutFile << "\nProcessors: " << Num_of_Processors << " [" << NF << " FCFS, "
 		<< NS << " SJF, " << NR << " RR]\n";
 	OutFile << "Processors Load\n";
 	for (int i = 0; i < Num_of_Processors; i++) {
-		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pLoad() * 100 << "%";
+		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pLoad() << "%";
 		if (i != Num_of_Processors - 1)
 			OutFile << ",\t";
 	}
-	OutFile << "\n\nProcessors Utiliz\n";
+	OutFile << "\n\nProcessors Utilization\n";
 	for (int i = 0; i < Num_of_Processors; i++) {
-		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pUtil() * 100 << "%";
+		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pUtil()  << "%";
 		AvgUtil += MultiProcessor[i]->Get_pUtil();
 		if (i != Num_of_Processors - 1)
 			OutFile << ",\t";
 	}
 	AvgUtil /= Num_of_Processors;
-	OutFile << "Avg Utilization = " << AvgUtil * 100 << "%\n";
+	OutFile << "\nAvg Utilization = " << AvgUtil << "%\n";
+	pOut->PrintOut("File has been created , check it please.");
 }
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
 	pIn->GetFileName(Filename); 
 	InFile.open(Filename +".txt"); 
-	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> M;
-	IDs = new int[M];
-	for (int i = 0; i < M; i++) {
+	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> INIT_M;
+	M = INIT_M;
+	IDs = new int[INIT_M];
+	for (int i = 0; i < INIT_M; i++) {
 		int AT, ID, CPU, N, IO_R, IO_D, sum_IOD = 0;
 		InFile >> AT >> ID >> CPU >> N;
 		Process* process = new Process(AT, CPU, ID);
@@ -210,6 +217,7 @@ void Scheduler::FCFSMigration(Process* Migrate) {
 				RRSQ = MultiProcessor[i];
 	}
 	RRSQ->AddProcess(Migrate);
+	ProcessesMaxW++;
 }
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -228,6 +236,7 @@ void Scheduler::RRMigration(Process* Migrate) {
 				SJFSQ = MultiProcessor[i];
 	}
 	SJFSQ->AddProcess(Migrate);
+	ProcessesRTF++;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -260,6 +269,7 @@ void Scheduler::WorkStealing() {
 		LQF = LQ->GET_QFT();
 		SQF = SQ->GET_QFT();
 		StealLimit = double(LQF - SQF) / LQF;
+		ProcessesStolen++;
 	}
 }
 
@@ -321,6 +331,8 @@ void Scheduler::TO_BLK(Process* P) {
 void Scheduler::TO_TRM(Process* P) {
 	P->SetTerminationTime(TimeStep);
 	P->SetLastRunTime(TimeStep);
+	P->SetTurnAroundDuration();
+	P->SetWaitingTime();
 	P->SetState(TRm);
 	P->GetProcessor()->UpdateState();
 	P->SetProcessor(nullptr);
@@ -341,7 +353,7 @@ void Scheduler::UpdateInterface() {
 		if (TimeStep == 1)
 			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
 		if (TRM.GetSize() == M)
-			pOut->PrintOut("Simulation ends, Output file created\n");
+			pOut->PrintOut("Simulation ends, Output file is created\n");
 	}
 	else {
 		cout << M << endl;
