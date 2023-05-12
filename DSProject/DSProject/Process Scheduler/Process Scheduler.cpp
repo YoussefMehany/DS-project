@@ -11,7 +11,7 @@ Scheduler::Scheduler() {
 	LQ = SQ = nullptr;
 	pIn = new Input;
 	pOut = new Output;
-	Mode = Interactive;
+	Mode = Interactive; 
 	srand(time(0));
 }
 void Scheduler::Set_Mode(InterfaceMode mode) {
@@ -76,8 +76,8 @@ void Scheduler::WriteData() {
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
-	pIn->GetFileName(Filename);
-	InFile.open(Filename + ".txt");
+	pIn->GetFileName(Filename); 
+	InFile.open(Filename +".txt"); 
 	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> M;
 	IDs = new int[M];
 	for (int i = 0; i < M; i++) {
@@ -128,6 +128,42 @@ bool Scheduler::Simulation() {
 		else break;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////
+
+
+	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
+		MultiProcessor[i]->ScheduleAlgo();
+	}
+
+	/////////////////////////////////// Perform IO tasks ///////////////////////////////
+
+	Process* Blocked = nullptr;
+	if (BLK.peek(Blocked)) {
+		if (!MakeIO(Blocked)) {
+			BLK.dequeue(Blocked);
+			Blocked->NextIO();
+			TO_SHORTEST_RDY(Blocked);
+		}
+	}
+	/////////////////////////////////// WORK STEALING ///////////////////////////////
+
+	if (!(TimeStep % STL) && Num_of_Processors)
+		WorkStealing();
+
+	/////////////////////////////////// Remove Orphans ///////////////////////////////
+
+
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
+			((FCFS*)MultiProcessor[i])->RemoveOrphans();
+		}
+	}
+	///////////////////////////////// Forking /////////////////////////////////////
+
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<FCFS*>(MultiProcessor[i]))  //Check Fork_Prob and add children
+			((FCFS*)MultiProcessor[i])->Forking();
+	}
 
 	////////////////////////////////// KILLSIG //////////////////////////////////////
 
@@ -141,47 +177,6 @@ bool Scheduler::Simulation() {
 		}
 	}
 
-	///////////////////////////////// Forking /////////////////////////////////////
-
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<FCFS*>(MultiProcessor[i]))  //Check Fork_Prob and add children
-			((FCFS*)MultiProcessor[i])->Forking();
-	}
-
-
-	/////////////////////////////////// WORK STEALING ///////////////////////////////
-
-	if (!(TimeStep % STL) && Num_of_Processors)
-		WorkStealing();
-
-	/////////////////////////////////////////////////////////////////////////////////
-
-
-	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
-		MultiProcessor[i]->ScheduleAlgo();
-	}
-
-	/////////////////////////////////// Perform IO tasks ///////////////////////////////
-
-	Process* Blocked = nullptr;
-	if(BLK.peek(Blocked)) {
-		if (!MakeIO(Blocked)) {
-			BLK.dequeue(Blocked);
-			Blocked->NextIO();
-			TO_SHORTEST_RDY(Blocked);
-		}
-	}
-
-	/////////////////////////////////// Remove Orphans ///////////////////////////////
-
-
-
-
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
-			((FCFS*)MultiProcessor[i])->RemoveOrphans();
-		}
-	}
 
 	return true;
 }
@@ -261,6 +256,7 @@ void Scheduler::WorkStealing() {
 		LQ->Lose(Stolen);
 		if (!Stolen) break;
 		SQ->AddProcess(Stolen);
+		Stolen = nullptr;
 		LQF = LQ->GET_QFT();
 		SQF = SQ->GET_QFT();
 		StealLimit = double(LQF - SQF) / LQF;
@@ -270,9 +266,9 @@ void Scheduler::WorkStealing() {
 /////////////////////////////IO_TASKS//////////////////////////////////////
 bool Scheduler::MakeIO(Process* Blocked) {
 	int Remaining = Blocked->GetIO()->getSecond();
-	if (Remaining) {
+	if (Remaining)
 		Blocked->GetIO()->SetSecond(--Remaining);
-	}
+
 	return Remaining;
 }
 
@@ -331,21 +327,13 @@ void Scheduler::TO_TRM(Process* P) {
 	TRM.enqueue(P);
 }
 
-void Scheduler::TO_RDY(Process* P, int& i) {
-	P->SetState(RDy);
-	MultiProcessor[i]->AddProcess(P);
-	i = (i + 1) % Num_of_Processors;
-}
+
 void Scheduler::TO_SHORTEST_RDY(Process* P) {
 	P->SetState(RDy);
 	DecideShortest();
 	SQ->AddProcess(P);
 }
-void Scheduler::SchedulerUpdater(Processor* P) {
-	P->UpdateState();
-	if (P->Get_Run())
-		P->Get_Run()->SetProcessor(nullptr);
-}
+
 void Scheduler::UpdateInterface() {
 
 	if (Mode == Silent)
@@ -362,7 +350,7 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(250);
+		else Sleep(100);
 		if (TRM.GetSize() != M)
 			system("CLS");
 	}

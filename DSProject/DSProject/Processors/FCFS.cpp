@@ -13,7 +13,7 @@ void FCFS::ScheduleAlgo() {
 		State = BUSY;
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 		R->SetState(RUn);
-		
+
 		QFT -= R->GetCPURemainingTime();
 
 		FCFSMigration(); //check for Migration Process First 
@@ -56,6 +56,7 @@ void FCFS::RemoveOrphans() {
 
 			S->TO_TRM(p);
 
+			i--;
 		}
 	}
 }
@@ -84,6 +85,7 @@ void FCFS::Kill(int PID) {
 		if (p->GetPID() == PID) {
 			RDY_LIST.Remove(i, p);
 			QFT -= p->GetCPURemainingTime();
+			p->SetChildrenState();
 			S->TO_TRM(p);
 			return;
 		}
@@ -91,16 +93,13 @@ void FCFS::Kill(int PID) {
 }
 
 void FCFS::FCFSMigration() {
-	/// <question>
-	/// shouldn't we check if its in the fork tree and not just that it has no parent.. ?
-	/// </question>
+
 	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
 		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
 
 			S->FCFSMigration(R);
 
 			if (RDY_LIST.RemoveHead(R)) {
-				State = BUSY;
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 				R->SetState(RUn);
 				QFT -= R->GetCPURemainingTime();
@@ -113,7 +112,7 @@ void FCFS::FCFSMigration() {
 void FCFS::Forking() {
 	int FP = S->Get_FP();
 	int Rand = 1 + rand() % 100;
-	if (R && Rand <= FP && (!R->GetLeftChild() && !R->GetRightChild())) {
+	if (R && Rand <= FP && (!R->GetLeftChild() || !R->GetRightChild())) {
 		Process* child = S->AddChildToSQ(R->GetArrivalTime(), R->GetCPURemainingTime());
 		if (!R->GetLeftChild()) {
 			R->SetLeftChild(child);
@@ -137,8 +136,11 @@ void FCFS::Lose(Process*& Stolen) {
 
 			QFT -= p->GetCPURemainingTime();
 
+			p->SetProcessor(nullptr);
+
 			Stolen = p;
 
+			break;
 		}
 	}
 

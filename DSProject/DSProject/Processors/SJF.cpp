@@ -19,9 +19,9 @@ void SJF::ScheduleAlgo() {
 	if (State == BUSY) {
 		TBT++;
 		R->UpdateInfo();
-		if (!R->GetCPURemainingTime()) {
+		if (!R->GetCPURemainingTime()) 
 			S->TO_TRM(R);
-		}
+		
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
 	}

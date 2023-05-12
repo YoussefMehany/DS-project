@@ -6,22 +6,33 @@ RR::RR(Scheduler* Sched, int tsr)
 	:Processor(Sched), TSR(tsr),TSRTemp(tsr) {}
 void RR::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.dequeue(R)) {
+
 		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());  // This Line and the next one should be added to all processors  
-		State = BUSY;
+		
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+
 		R->SetState(RUn);
+
+		State = BUSY;
+
 		QFT -= R->GetCPURemainingTime();
+
 		RRMigration();
 	}
 	if (State == BUSY) {
+
 		TSRTemp--;
+
 		TBT++;
+
 		R->UpdateInfo();
-		if (!R->GetCPURemainingTime()) {
+
+		if (!R->GetCPURemainingTime())
 			S->TO_TRM(R);
-		}
+
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
+
 		else if(!TSRTemp)
 			Round();
 	}
@@ -62,11 +73,9 @@ void RR::RRMigration() {
 			S->RRMigration(R);
 
 			if (RDY_LIST.dequeue(R)) {
-				State = BUSY;
 				QFT -= R->GetCPURemainingTime();
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 				R->SetState(RUn);
-				R->SetProcessor(this);
 			}
 			else { State = IDLE; break; }
 		}
