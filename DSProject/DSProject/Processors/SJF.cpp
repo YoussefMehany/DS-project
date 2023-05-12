@@ -2,8 +2,8 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-SJF::SJF(Scheduler* Sched)
-	:Processor(Sched) {}
+SJF::SJF(Scheduler* Sched,int n)
+	:Processor(Sched,n) {}
 void SJF::ScheduleAlgo() {
 	
 	if (State == IDLE && RDY_LIST.dequeue(R)) {
@@ -24,6 +24,24 @@ void SJF::ScheduleAlgo() {
 		
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
+	}
+	else if (State == STOP) {
+		if (N_TEMP == N) {
+			if (R) {
+				R->SetProcessor(nullptr);
+				S->TO_SHORTEST_RDY(R);
+			}
+			while (RDY_LIST.dequeue(R))
+				S->TO_SHORTEST_RDY(R);
+			QFT = 0;
+			R = nullptr;
+		}
+		else if (!N_TEMP) {
+			State = IDLE;
+			N_TEMP = N;
+			return;
+		}
+		N_TEMP--;
 	}
 	else TIT++;
 

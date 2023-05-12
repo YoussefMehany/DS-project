@@ -6,7 +6,7 @@ class RR : public Processor {
 	Queue<Process*> RDY_LIST;
 	void Round();
 public:
-	RR(Scheduler* Sched,int tsr);
+	RR(Scheduler* Sched,int tsr,int n);
 	void RRMigration();
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);

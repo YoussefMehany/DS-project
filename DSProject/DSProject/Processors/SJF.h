@@ -5,7 +5,7 @@
 class SJF : public Processor {
 	PriorityQueue<Process*> RDY_LIST;
 public:
-	SJF(Scheduler* Sched);
+	SJF(Scheduler* Sched,int n);
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
 	virtual void Lose(Process*& Stolen);

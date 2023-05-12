@@ -8,6 +8,7 @@
 
 Scheduler::Scheduler() {
 	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = ProcessesMaxW = ProcessesRTF = ProcessesStolen = 0;
+	Heat_Prob = 5;
 	MultiProcessor = nullptr;
 	IDs = nullptr;
 	LQ = SQ = nullptr;
@@ -19,18 +20,18 @@ Scheduler::Scheduler() {
 void Scheduler::Set_Mode(InterfaceMode mode) {
 	Mode = mode;
 }
-void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR) {
+void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR,int n) {
 	Num_of_Processors = FCFScnt + SJFcnt + RRcnt;
 	MultiProcessor = new Processor * [Num_of_Processors];
 	int cnt = 0;
 	while (FCFScnt--) {
-		MultiProcessor[cnt++] = new FCFS(this);
+		MultiProcessor[cnt++] = new FCFS(this,n);
 	}
 	while (SJFcnt--) {
-		MultiProcessor[cnt++] = new SJF(this);
+		MultiProcessor[cnt++] = new SJF(this,n);
 	}
 	while (RRcnt--) {
-		MultiProcessor[cnt++] = new RR(this, TSR);
+		MultiProcessor[cnt++] = new RR(this, TSR,n);
 	}
 }
 
@@ -83,27 +84,28 @@ void Scheduler::WriteData() {
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
+	int n;
 	pIn->GetFileName(Filename); 
 	InFile.open(Filename +".txt"); 
-	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> INIT_M;
+	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n>>INIT_M;
 	M = INIT_M;
 	IDs = new int[INIT_M];
 	for (int i = 0; i < INIT_M; i++) {
-		int AT, ID, CPU, N, IO_R, IO_D, sum_IOD = 0;
-		InFile >> AT >> ID >> CPU >> N;
+		int AT, ID, CPU, N_IO, IO_R, IO_D, sum_IOD = 0;
+		InFile >> AT >> ID >> CPU >> N_IO;
 		Process* process = new Process(AT, CPU, ID);
 		IDs[i] = ID;
-		while (N--) {
+		while (N_IO--) {
 			char dummy;
 			InFile >> dummy >> IO_R >> dummy >> IO_D >> dummy;
 			sum_IOD += IO_D;
-			if (N) InFile >> dummy;
+			if (N_IO) InFile >> dummy;
 			process->AddIO(IO_R, IO_D);
 		}
 		process->SetTIOD(sum_IOD);
 		NEW.enqueue(process);
 	}
-	AddProcessors(NF, NS, NR, TSR);
+	AddProcessors(NF, NS, NR, TSR,n);
 	int T, PID;
 	while (InFile >> T) {
 		InFile >> PID;
@@ -140,6 +142,9 @@ bool Scheduler::Simulation() {
 
 
 	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
+		int Overheat_Prob = 1 + rand() % 100;
+		if (Overheat_Prob <= Heat_Prob)
+			MultiProcessor[i]->SetProcessorState(STOP);
 		MultiProcessor[i]->ScheduleAlgo();
 	}
 
@@ -289,10 +294,12 @@ void Scheduler::DecideShortest() {
 	int index = 0;
 	if (Num_of_Processors) {
 		for (int i = 0; i < Num_of_Processors; i++) {
-			int QFT = MultiProcessor[i]->GET_QFT();
-			if (QFT < CPU_Min) {
-				index = i;
-				CPU_Min = QFT;
+			if (MultiProcessor[i]->Get_State() != STOP) {
+				int QFT = MultiProcessor[i]->GET_QFT();
+				if (QFT < CPU_Min) {
+					index = i;
+					CPU_Min = QFT;
+				}
 			}
 		}
 		SQ = MultiProcessor[index];

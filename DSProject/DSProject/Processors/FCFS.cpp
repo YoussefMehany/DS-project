@@ -1,8 +1,8 @@
 #include "FCFS.h"
 #include "../Process Scheduler/Process Scheduler.h"
 
-FCFS::FCFS(Scheduler* Sched)
-	:Processor(Sched) {}
+FCFS::FCFS(Scheduler* Sched , int n)
+	:Processor(Sched,n) {}
 
 
 void FCFS::ScheduleAlgo() {
@@ -30,6 +30,24 @@ void FCFS::ScheduleAlgo() {
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
 
+	}
+	else if (State == STOP) {
+		if (N_TEMP == N) {
+			if (R) {
+				R->SetProcessor(nullptr);
+				S->TO_SHORTEST_RDY(R);
+			}
+			while (RDY_LIST.RemoveHead(R))
+				S->TO_SHORTEST_RDY(R);
+			R = nullptr;
+			QFT = 0;
+		}
+		else if (!N_TEMP) {
+			State = IDLE;
+			N_TEMP = N;
+			return;
+		}
+		N_TEMP--;
 	}
 	else TIT++;
 }

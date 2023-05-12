@@ -9,7 +9,8 @@ enum ProcessState {
 };
 enum ProcessorState {
 	BUSY,
-	IDLE
+	IDLE,
+	STOP
 };
 enum InterfaceMode 
 {

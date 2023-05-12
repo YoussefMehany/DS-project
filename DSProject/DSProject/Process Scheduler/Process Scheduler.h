@@ -19,7 +19,7 @@ class Scheduler
 	Output* pOut;
 	int* IDs;
 	int TimeStep, Turn;
-	int NS, NF, NR, RTF, M, INIT_M, MaxW, STL, Fork_Prob;
+	int NS, NF, NR, RTF, M, INIT_M, MaxW, STL, Fork_Prob, Heat_Prob;
 	int ProcessesRTF, ProcessesMaxW, ProcessesStolen;
 	int Num_of_Processors; //Total number of processors
 	int TTAT; //Total TurnAround time
@@ -33,7 +33,7 @@ public:
 	void Get_Data(); //Get Data from the input file
 	void WriteData();
 	void Set_Mode(InterfaceMode mode);
-	void AddProcessors(int FCFCcnt, int SJFcnt, int RRcnt,int TSR);
+	void AddProcessors(int FCFCcnt, int SJFcnt, int RRcnt,int TSR,int n);
 	void TO_SHORTEST_RDY(Process* P);
 	void TO_TRM(Process* P); //Move to TRM List
 	void TO_BLK(Process* P); //Move to BLK List

@@ -2,8 +2,8 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-RR::RR(Scheduler* Sched, int tsr)
-	:Processor(Sched), TSR(tsr),TSRTemp(tsr) {}
+RR::RR(Scheduler* Sched, int tsr,int n)
+	:Processor(Sched,n), TSR(tsr),TSRTemp(tsr) {}
 void RR::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.dequeue(R)) {
 
@@ -35,6 +35,24 @@ void RR::ScheduleAlgo() {
 
 		else if(!TSRTemp)
 			Round();
+	}
+	else if (State == STOP) {
+		if (N_TEMP == N) {
+			if (R) {
+				R->SetProcessor(nullptr);
+				S->TO_SHORTEST_RDY(R);
+			}
+			while (RDY_LIST.dequeue(R))
+				S->TO_SHORTEST_RDY(R);
+			QFT = 0;
+			R = nullptr;
+		}
+		else if (!N_TEMP) {
+			State = IDLE;
+			N_TEMP = N;
+			return;
+		}
+		N_TEMP--;
 	}
 	else TIT++;
 }
