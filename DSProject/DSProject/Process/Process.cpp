@@ -47,7 +47,6 @@ int Process::GetTurnAroundDuration()const {
 	return TurnAroundDuration;
 }
 int Process::GetWaitingTime()const {
-	cout << WaitingTime << endl;
 	return WaitingTime;
 }
 int Process::GetTIOD()const

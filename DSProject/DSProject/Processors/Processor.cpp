@@ -25,6 +25,9 @@ Process* Processor::Get_Run()const {
 int Processor::GET_QFT()const{
 	return QFT;
 }
+int Processor::Get_ID()const {
+	return ID;
+}
 int Processor::Get_HeatFactor()const {
 	return N_TEMP;
 }

@@ -7,7 +7,6 @@ RR::RR(Scheduler* Sched, int tsr,int n)
 void RR::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.dequeue(R)) {
 
-		
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 
 		R->SetState(RUn);

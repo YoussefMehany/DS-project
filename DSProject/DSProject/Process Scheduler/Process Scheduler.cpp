@@ -143,7 +143,6 @@ bool Scheduler::Simulation() {
 			MultiProcessor[i]->SetProcessorState(STOP);
 		}
 		MultiProcessor[i]->ScheduleAlgo();
-
 	}
 
 	/////////////////////////////////// Perform IO tasks ///////////////////////////////
@@ -161,6 +160,7 @@ bool Scheduler::Simulation() {
 
 	if (!(TimeStep % STL) && Num_of_Processors)
 		WorkStealing();
+	 
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
 
 
@@ -242,7 +242,6 @@ void Scheduler::WorkStealing() {
 	if (!LQ) return;
 	int LQF = LQ->GET_QFT(), SQF = SQ->GET_QFT();
 	double StealLimit = double(LQF - SQF) / LQF;
-
 	while (LQF > 0 && StealLimit > 0.4)
 	{
 		LQ->Lose(Stolen);
@@ -352,6 +351,7 @@ void Scheduler::CoolingSystem(bool fcfs) {
 	}
 	if (OverHeated == (fcfs ? NF : Num_of_Processors)) {
 		Coolest->SetProcessorState(IDLE);
+		Coolest->Reset_HeatFactor();
 	}
 }
 

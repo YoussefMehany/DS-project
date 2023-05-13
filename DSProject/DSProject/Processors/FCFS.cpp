@@ -108,20 +108,25 @@ void FCFS::Kill(int PID) {
 
 void FCFS::FCFSMigration() {
 
-	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
+	if (S->Get_NR() && !R->GetParent() && R->GetState() != ORPH) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
 		S->DecideShortest(2);
 		if (!S->GetSRR()) return; //return if the RR processors are OverHeated
-		while (R->GetCurrWaitingTime(S->Get_TimeStep()) > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
-
+		while (R && R->GetCurrWaitingTime(S->Get_TimeStep()) > S->Get_MaxW()) {
+			
 			S->FCFSMigration(R);
 
-			if (RDY_LIST.RemoveHead(R)) {
-				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
-				R->SetState(RUn);
-				State = BUSY;
-				QFT -= R->GetCPURemainingTime();
+			Process* p = nullptr;
+			for (int i = 0; i < RDY_LIST.size(); i++) {
+				RDY_LIST.GetItem(i, p);
+				if (!p->GetParent() && p->GetState() != ORPH) {
+					RDY_LIST.Remove(i, R);
+					if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+					R->SetState(RUn);
+					State = BUSY;
+					QFT -= R->GetCPURemainingTime();
+					break;
+				}
 			}
-			else break;
 		}
 	}
 }

@@ -21,6 +21,7 @@ public:
 	double Get_pUtil() const;
 	double Get_pLoad() const;
 	int GET_QFT()const;
+	int Get_ID()const;
 	int Get_HeatFactor()const;
 	void Reset_HeatFactor();
 	void UpdateState();
