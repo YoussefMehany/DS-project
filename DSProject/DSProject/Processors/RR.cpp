@@ -7,7 +7,6 @@ RR::RR(Scheduler* Sched, int tsr,int n)
 void RR::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.dequeue(R)) {
 
-		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());  // This Line and the next one should be added to all processors  
 		
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 
@@ -42,8 +41,12 @@ void RR::ScheduleAlgo() {
 				R->SetProcessor(nullptr);
 				S->TO_SHORTEST_RDY(R);
 			}
-			while (RDY_LIST.dequeue(R))
+			int Size = RDY_LIST.GetSize();
+			while (Size--){
+				RDY_LIST.dequeue(R);
+				R->SetProcessor(nullptr);
 				S->TO_SHORTEST_RDY(R);
+			}
 			QFT = 0;
 			R = nullptr;
 		}
@@ -52,7 +55,8 @@ void RR::ScheduleAlgo() {
 			N_TEMP = N;
 			return;
 		}
-		N_TEMP--;
+		if (State == STOP) N_TEMP--;
+		else N_TEMP = N;
 	}
 	else TIT++;
 }
@@ -86,7 +90,7 @@ void RR::Lose(Process*& Stolen) {
 void RR::RRMigration() {
 
 	if (S->Get_NS()) { //Don't enter if no SJF exists 
-		S->DecideShortestSpecific(1);
+		S->DecideShortest(1);
 		if (!S->GetSSJF()) return;
 		while (R->GetCPURemainingTime() < S->Get_RTF()) { //Migrate Multiple Processes in the same time step until a process has Remaining Time less than RTF
 			
@@ -95,7 +99,6 @@ void RR::RRMigration() {
 			if (RDY_LIST.dequeue(R)) {
 				QFT -= R->GetCPURemainingTime();
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
-				R->SetProcessor(this);
 				R->SetState(RUn);
 				State = BUSY;
 			}

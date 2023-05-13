@@ -3,7 +3,7 @@
 int Process::TTAT = 0;
 int Process::LastID = 0;
 Process::Process() {
-	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime =  CurrWaitingTime = 0;
+	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime =  0;
 	LastRunTime = 1;
 	State = NEW;
 	Parent = Lchild = Rchild = nullptr;
@@ -25,11 +25,8 @@ Process::Process(int ArrivalTime, int CPUTime, int PID) {
 	Lchild = Rchild = Parent = nullptr;
 	RunProcessor = nullptr;
 }
-int Process::GetCurrWaitingTime()const {
-	return CurrWaitingTime;
-}
-int Process::GetLastRunTime()const {
-	return LastRunTime;
+int Process::GetCurrWaitingTime(int TimeStep)const {
+	return TimeStep - ArrivalTime - (CPUTime - CPUTemp);
 }
 int Process::GetPID()const {
 	return PID;
@@ -50,6 +47,7 @@ int Process::GetTurnAroundDuration()const {
 	return TurnAroundDuration;
 }
 int Process::GetWaitingTime()const {
+	cout << WaitingTime << endl;
 	return WaitingTime;
 }
 int Process::GetTIOD()const
@@ -98,7 +96,7 @@ int Process::GetTTAT() {
 	return TTAT;
 }
 void Process::SetWaitingTime() {
-	  WaitingTime =  TurnAroundDuration - (CPUTime - CPUTemp);
+	  WaitingTime =  TurnAroundDuration - (CPUTime-CPUTemp);
 }
 void Process::SetState(ProcessState state) {
 	State = state;
@@ -120,12 +118,6 @@ void Process::SetRightChild(Process* child) {
 }
 void Process::SetParent(Process* parent) {
 	Parent = parent;
-}
-void Process::AddWaitingTime(int Time) {
-	CurrWaitingTime += Time;
-}
-void Process::SetLastRunTime(int Time) {
-	LastRunTime = Time;
 }
 void Process::SetTIOD(int TIOD) {
 	this->TIOD = TIOD;

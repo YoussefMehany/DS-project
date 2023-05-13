@@ -1,14 +1,13 @@
 #include "FCFS.h"
 #include "../Process Scheduler/Process Scheduler.h"
 
-FCFS::FCFS(Scheduler* Sched , int n)
-	:Processor(Sched,n) {}
+FCFS::FCFS(Scheduler* Sched, int n)
+	:Processor(Sched, n) {}
 
 
 void FCFS::ScheduleAlgo() {
 	if (State == IDLE && RDY_LIST.RemoveHead(R)) {
 
-		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());  // This Line and the next one should be added to all processors  
 
 		State = BUSY;
 		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
@@ -17,6 +16,7 @@ void FCFS::ScheduleAlgo() {
 		QFT -= R->GetCPURemainingTime();
 
 		FCFSMigration(); //check for Migration Process First 
+
 	}
 	if (State == BUSY) {
 
@@ -37,17 +37,23 @@ void FCFS::ScheduleAlgo() {
 				R->SetProcessor(nullptr);
 				S->TO_SHORTEST_RDY(R, true);
 			}
-			while (RDY_LIST.RemoveHead(R))
+			int Size = RDY_LIST.size();
+			while (Size--) {
+				RDY_LIST.RemoveHead(R);
+				R->SetProcessor(nullptr);
 				S->TO_SHORTEST_RDY(R, true);
+			}
 			R = nullptr;
 			QFT = 0;
+
 		}
 		else if (!N_TEMP) {
 			State = IDLE;
 			N_TEMP = N;
 			return;
 		}
-		N_TEMP--;
+		if (State == STOP) N_TEMP--;
+		else N_TEMP = N;
 	}
 	else TIT++;
 }
@@ -103,15 +109,14 @@ void FCFS::Kill(int PID) {
 void FCFS::FCFSMigration() {
 
 	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
-		S->DecideShortestSpecific(2);
+		S->DecideShortest(2);
 		if (!S->GetSRR()) return; //return if the RR processors are OverHeated
-		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
+		while (R->GetCurrWaitingTime(S->Get_TimeStep()) > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
 
 			S->FCFSMigration(R);
 
 			if (RDY_LIST.RemoveHead(R)) {
 				if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
-				R->SetProcessor(this);
 				R->SetState(RUn);
 				State = BUSY;
 				QFT -= R->GetCPURemainingTime();

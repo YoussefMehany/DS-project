@@ -2,26 +2,25 @@
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-SJF::SJF(Scheduler* Sched,int n)
-	:Processor(Sched,n) {}
+SJF::SJF(Scheduler* Sched, int n)
+	:Processor(Sched, n) {}
 void SJF::ScheduleAlgo() {
-	
-	if (State == IDLE && RDY_LIST.dequeue(R)) {
-		R->AddWaitingTime(S->Get_TimeStep() - R->GetLastRunTime());
 
-        if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
+	if (State == IDLE && RDY_LIST.dequeue(R)) {
+
+		if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
 
 		State = BUSY;
-	
+
 		R->SetState(RUn);
 		QFT -= R->GetCPURemainingTime();
 	}
 	if (State == BUSY) {
 		TBT++;
 		R->UpdateInfo();
-		if (!R->GetCPURemainingTime()) 
+		if (!R->GetCPURemainingTime())
 			S->TO_TRM(R);
-		
+
 		else if (R->GetIO() && !R->GetIO()->getFirst())
 			S->TO_BLK(R);
 	}
@@ -31,8 +30,15 @@ void SJF::ScheduleAlgo() {
 				R->SetProcessor(nullptr);
 				S->TO_SHORTEST_RDY(R);
 			}
-			while (RDY_LIST.dequeue(R))
+
+			int Size = RDY_LIST.getSize();
+
+			while (Size--) {
+				RDY_LIST.dequeue(R);
+				R->SetProcessor(nullptr);
 				S->TO_SHORTEST_RDY(R);
+			}
+
 			QFT = 0;
 			R = nullptr;
 		}
@@ -41,7 +47,8 @@ void SJF::ScheduleAlgo() {
 			N_TEMP = N;
 			return;
 		}
-		N_TEMP--;
+		if (State == STOP) N_TEMP--;
+		else N_TEMP = N;
 	}
 	else TIT++;
 

@@ -17,7 +17,7 @@ class Scheduler
 	string Filename;
 	Input* pIn;
 	Output* pOut;
-	int TimeStep, Turn;
+	int TimeStep;
 	int NS, NF, NR, RTF, M, INIT_M, MaxW, STL, Fork_Prob, Heat_Prob, n;
 	int ProcessesRTF, ProcessesMaxW, ProcessesStolen;
 	int Num_of_Processors; //Total number of processors
@@ -41,9 +41,8 @@ public:
 	void CoolingSystem(bool fcfs = false);
 	void FCFSMigration(Process* Migrate);
 	void RRMigration(Process* Migrate);
-	void DecideShortest();
 	void DecideLongest();
-	void DecideShortestSpecific(int Type);
+	void DecideShortest(int Type);
 	Process* AddChildToSQ(int ArrivalT, int RemCPU);
 	int Get_TimeStep();
 	int Get_MaxW() const;
