@@ -8,7 +8,7 @@
 
 Scheduler::Scheduler() {
 	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = ProcessesMaxW = ProcessesRTF = ProcessesStolen = 0;
-	Heat_Prob = 5;
+	Heat_Prob = 2;
 	MultiProcessor = nullptr;
 	IDs = nullptr;
 	LQ = SQ = nullptr;
@@ -20,18 +20,18 @@ Scheduler::Scheduler() {
 void Scheduler::Set_Mode(InterfaceMode mode) {
 	Mode = mode;
 }
-void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR,int n) {
+void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR, int n) {
 	Num_of_Processors = FCFScnt + SJFcnt + RRcnt;
 	MultiProcessor = new Processor * [Num_of_Processors];
 	int cnt = 0;
 	while (FCFScnt--) {
-		MultiProcessor[cnt++] = new FCFS(this,n);
+		MultiProcessor[cnt++] = new FCFS(this, n);
 	}
 	while (SJFcnt--) {
-		MultiProcessor[cnt++] = new SJF(this,n);
+		MultiProcessor[cnt++] = new SJF(this, n);
 	}
 	while (RRcnt--) {
-		MultiProcessor[cnt++] = new RR(this, TSR,n);
+		MultiProcessor[cnt++] = new RR(this, TSR, n);
 	}
 }
 
@@ -216,7 +216,7 @@ void Scheduler::FCFSMigration(Process* Migrate) {
 	Migrate->SetProcessor(nullptr);
 	Processor* RRSQ = nullptr; //RR Shortest Ready Queue
 	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<RR*>(MultiProcessor[i]))
+		if (dynamic_cast<RR*>(MultiProcessor[i]) && MultiProcessor[i]->Get_State() != STOP)
 			if (!RRSQ)
 				RRSQ = MultiProcessor[i];
 			else if (RRSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
@@ -235,7 +235,7 @@ void Scheduler::RRMigration(Process* Migrate) {
 	Migrate->SetProcessor(nullptr);
 	Processor* SJFSQ = nullptr; //SJF Shortest Ready Queue
 	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<SJF*>(MultiProcessor[i]))
+		if (dynamic_cast<SJF*>(MultiProcessor[i]) && MultiProcessor[i]->Get_State() != STOP)
 			if (!SJFSQ)
 				SJFSQ = MultiProcessor[i];
 			else if (SJFSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
@@ -254,13 +254,8 @@ Processor* Scheduler::GetSQ() const {
 }
 void Scheduler::WorkStealing() {
 
-	if (!LQ) LQ = MultiProcessor[0];
-	if (!SQ) SQ = MultiProcessor[0];
-
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (LQ->GET_QFT() < MultiProcessor[i]->GET_QFT()) LQ = MultiProcessor[i];
-		if (SQ->GET_QFT() > MultiProcessor[i]->GET_QFT()) SQ = MultiProcessor[i];
-	}
+	DecideLongest();
+	DecideShortest();
 
 	Process* Stolen = nullptr;
 	int LQF = LQ->GET_QFT(), SQF = SQ->GET_QFT();
@@ -288,22 +283,37 @@ bool Scheduler::MakeIO(Process* Blocked) {
 	return Remaining;
 }
 
-
-void Scheduler::DecideShortest() {
-	int CPU_Min = INT_MAX;
-	int index = 0;
-	if (Num_of_Processors) {
-		for (int i = 0; i < Num_of_Processors; i++) {
-			if (MultiProcessor[i]->Get_State() != STOP) {
-				int QFT = MultiProcessor[i]->GET_QFT();
-				if (QFT < CPU_Min) {
-					index = i;
-					CPU_Min = QFT;
-				}
+void Scheduler::DecideLongest() {
+	int CPU_Max = -1;
+	int index = -1;
+	LQ = nullptr;
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (MultiProcessor[i]->Get_State() != STOP) {
+			int QFT = MultiProcessor[i]->GET_QFT();
+			if (QFT > CPU_Max) {
+				index = i;
+				CPU_Max = QFT;
 			}
 		}
-		SQ = MultiProcessor[index];
 	}
+	if(~index) 
+		LQ = MultiProcessor[index];
+}
+void Scheduler::DecideShortest() {
+	int CPU_Min = INT_MAX;
+	int index = -1;
+	SQ = nullptr;
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (MultiProcessor[i]->Get_State() != STOP) {
+			int QFT = MultiProcessor[i]->GET_QFT();
+			if (QFT < CPU_Min) {
+				index = i;
+				CPU_Min = QFT;
+			}
+		}
+	}
+	if (~index)
+		SQ = MultiProcessor[index];
 }
 
 Processor* Scheduler::DecideShortestFCFS() {

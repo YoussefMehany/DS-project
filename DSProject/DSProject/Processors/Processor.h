@@ -7,7 +7,7 @@ class Processor {
 
 protected:
 	static int Counter;
-	int QFT, ID, TBT, TIT,N_TEMP,N; //TBT->Total Busy Time ,TIT->Total Idle Time, QFT->Queue Finish Time, N timesteps for overheating
+	int QFT, ID, TBT, TIT,N_TEMP, N; //TBT->Total Busy Time ,TIT->Total Idle Time, QFT->Queue Finish Time, N timesteps for overheating
 	double pLoad, pUtil;
 	Process* R;
 	ProcessorState State;

@@ -53,27 +53,17 @@ void FCFS::ScheduleAlgo() {
 }
 
 void FCFS::RemoveOrphans() {
-
 	if (R && R->GetState() == ORPH) {
-
 		QFT -= R->GetCPURemainingTime();
-
 		S->TO_TRM(R);
 	}
 	for (int i = 0; i < RDY_LIST.size(); i++) {
-
 		Process* p = nullptr;
-
 		RDY_LIST.GetItem(i, p);
-
 		if (p->GetState() == ORPH) {
-
 			QFT -= p->GetCPURemainingTime(); //need to discuss
-
 			RDY_LIST.Remove(i, p);
-
 			S->TO_TRM(p);
-
 			i--;
 		}
 	}
@@ -145,23 +135,14 @@ void FCFS::Forking() {
 
 void FCFS::Lose(Process*& Stolen) {
 	Process* p = nullptr;
-
 	for (int i = 0; i < RDY_LIST.size(); i++) {
-
 		RDY_LIST.GetItem(i, p);
-
 		if (!p->GetParent() && p->GetState() != ORPH) {
-
 			RDY_LIST.Remove(i, p);
-
 			QFT -= p->GetCPURemainingTime();
-
 			p->SetProcessor(nullptr);
-
 			Stolen = p;
-
 			break;
 		}
 	}
-
 }

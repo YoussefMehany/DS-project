@@ -1,0 +1,2 @@
+-if all of the processors are overheated then we should turn the coolest processor to IDLE state
+-if the process being moved from the overheated processor is a forked process and all other FCFS are also overheated we keep it inside of the RDY_LIST
