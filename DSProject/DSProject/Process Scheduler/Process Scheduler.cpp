@@ -7,11 +7,10 @@
 #include <windows.h>
 
 Scheduler::Scheduler() {
-	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = ProcessesMaxW = ProcessesRTF = ProcessesStolen = 0;
+	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = Turn = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = 0;
 	Heat_Prob = 2;
 	MultiProcessor = nullptr;
-	IDs = nullptr;
-	LQ = SQ = nullptr;
+	LQ = SQ = SFCFS = SSJF = SRR = nullptr;
 	pIn = new Input;
 	pOut = new Output;
 	Mode = Interactive; 
@@ -22,7 +21,7 @@ void Scheduler::Set_Mode(InterfaceMode mode) {
 }
 void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR, int n) {
 	Num_of_Processors = FCFScnt + SJFcnt + RRcnt;
-	MultiProcessor = new Processor * [Num_of_Processors];
+	MultiProcessor = new Processor* [Num_of_Processors];
 	int cnt = 0;
 	while (FCFScnt--) {
 		MultiProcessor[cnt++] = new FCFS(this, n);
@@ -57,7 +56,7 @@ void Scheduler::WriteData() {
 		<< "Avg WT = " << AvgWaitingTime << ",\t\tAvg RT = " << AvgResponseTime <<
 		",\t\tAvgTRT = " << AvgTurnAroundTime << '\n';
 	double forked_per = 100*(double)(M - INIT_M) / M;
-	OutFile << fixed << setprecision(3)<< "Migration %:\t\tRTF= " << 100.0*ProcessesRTF/M <<
+	OutFile << fixed << setprecision(3)<< "Migration %:\t\tRTF= " << 100.0*ProcessesRTF / M <<
 		"%,\t\tMaxW = " << 100.0*ProcessesMaxW / M <<
 		"%\nWork Steal: "<< 100.0*ProcessesStolen / M <<"%\nForked Process: "<<forked_per;
 
@@ -84,17 +83,14 @@ void Scheduler::WriteData() {
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
-	int n;
 	pIn->GetFileName(Filename); 
 	InFile.open(Filename +".txt"); 
-	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n>>INIT_M;
+	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
 	M = INIT_M;
-	IDs = new int[INIT_M];
 	for (int i = 0; i < INIT_M; i++) {
 		int AT, ID, CPU, N_IO, IO_R, IO_D, sum_IOD = 0;
 		InFile >> AT >> ID >> CPU >> N_IO;
 		Process* process = new Process(AT, CPU, ID);
-		IDs[i] = ID;
 		while (N_IO--) {
 			char dummy;
 			InFile >> dummy >> IO_R >> dummy >> IO_D >> dummy;
@@ -145,6 +141,7 @@ bool Scheduler::Simulation() {
 		int Overheat_Prob = 1 + rand() % 100;
 		if (Overheat_Prob <= Heat_Prob)
 			MultiProcessor[i]->SetProcessorState(STOP);
+
 		MultiProcessor[i]->ScheduleAlgo();
 	}
 
@@ -214,15 +211,7 @@ void Scheduler::FCFSMigration(Process* Migrate) {
 	Migrate->SetState(RDy);
 	Migrate->GetProcessor()->UpdateState();
 	Migrate->SetProcessor(nullptr);
-	Processor* RRSQ = nullptr; //RR Shortest Ready Queue
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<RR*>(MultiProcessor[i]) && MultiProcessor[i]->Get_State() != STOP)
-			if (!RRSQ)
-				RRSQ = MultiProcessor[i];
-			else if (RRSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
-				RRSQ = MultiProcessor[i];
-	}
-	RRSQ->AddProcess(Migrate);
+	SRR->AddProcess(Migrate);
 	ProcessesMaxW++;
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -233,15 +222,7 @@ void Scheduler::RRMigration(Process* Migrate) {
 	Migrate->SetState(RDy);
 	Migrate->GetProcessor()->UpdateState();
 	Migrate->SetProcessor(nullptr);
-	Processor* SJFSQ = nullptr; //SJF Shortest Ready Queue
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<SJF*>(MultiProcessor[i]) && MultiProcessor[i]->Get_State() != STOP)
-			if (!SJFSQ)
-				SJFSQ = MultiProcessor[i];
-			else if (SJFSQ->GET_QFT() > MultiProcessor[i]->GET_QFT())
-				SJFSQ = MultiProcessor[i];
-	}
-	SJFSQ->AddProcess(Migrate);
+	SSJF->AddProcess(Migrate);
 	ProcessesRTF++;
 }
 
@@ -316,24 +297,38 @@ void Scheduler::DecideShortest() {
 		SQ = MultiProcessor[index];
 }
 
-Processor* Scheduler::DecideShortestFCFS() {
+void Scheduler::DecideShortestSpecific(int Type) { //decide the shortest queue of a specific type depending on the argument sent
+	//Types: FCFS: 0, SJF: 1, RR: 2
 	int CPU_Min = INT_MAX;
-	int index = 0;
+	(Type == 0 ? SFCFS : Type == 1 ? SSJF : SRR) = nullptr;
+	int index = -1;
 	for (int i = 0; i < Num_of_Processors; i++) {
 		int QFT = INT_MAX;
-		if (dynamic_cast<FCFS*>(MultiProcessor[i]))
+		Processor* dynamic = nullptr;
+		if (Type == 0) {
+			dynamic = dynamic_cast<FCFS*>(MultiProcessor[i]);
+		}
+		else if (Type == 1) {
+			dynamic = dynamic_cast<SJF*>(MultiProcessor[i]);
+		}
+		else {
+			dynamic = dynamic_cast<RR*>(MultiProcessor[i]);
+		}
+		if (dynamic && MultiProcessor[i]->Get_State() != STOP)
 			QFT = MultiProcessor[i]->GET_QFT();
 		if (QFT < CPU_Min) {
 			index = i;
 			CPU_Min = QFT;
 		}
 	}
-	return MultiProcessor[index];
+	if(~index)
+		(Type == 0 ? SFCFS : Type == 1 ? SSJF : SRR) = MultiProcessor[index];
 }
 
 Process* Scheduler::AddChildToSQ(int ArrivalT, int RemCPU) {
 	Process* child = new Process(ArrivalT, RemCPU);
-	DecideShortestFCFS()->AddProcess(child);
+	DecideShortestSpecific(0);
+	SFCFS->AddProcess(child);
 	M++;
 	return child;
 }
@@ -356,12 +351,44 @@ void Scheduler::TO_TRM(Process* P) {
 	P->SetProcessor(nullptr);
 	TRM.enqueue(P);
 }
+void Scheduler::CoolingSystem(bool fcfs) {
+	Processor* Coolest = nullptr;
+	int OverHeated = 0;
+	int MinHeatFactor = n + 1;
+	for (int i = 0; i < Num_of_Processors; i++) {
+		bool Stop = MultiProcessor[i]->Get_State() == STOP;
+		if (fcfs && dynamic_cast<FCFS*>(MultiProcessor[i]) && Stop || (!fcfs && Stop)) {
+			if (MultiProcessor[i]->Get_HeatFactor() < MinHeatFactor) {
+				MinHeatFactor = MultiProcessor[i]->Get_HeatFactor();
+				Coolest = MultiProcessor[i];
+			}
+			OverHeated++;
+		}
+	}
+	if (OverHeated == (fcfs ? NF : Num_of_Processors)) {
+		Coolest->Reset_HeatFactor();
+		Coolest->SetProcessorState(IDLE);
+	}
+}
 
-
-void Scheduler::TO_SHORTEST_RDY(Process* P) {
+void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 	P->SetState(RDy);
-	DecideShortest();
-	SQ->AddProcess(P);
+	if (!fcfs) {
+		DecideShortest();
+		if (!SQ) {
+			CoolingSystem(); //Check if all processors are in STOP state, then cool the least heated one
+			DecideShortest();
+		}
+		SQ->AddProcess(P);
+	}
+	else {
+		DecideShortestSpecific(0);
+		if (!SFCFS) {
+			CoolingSystem(true);
+			DecideShortestSpecific(0);
+		}
+		SFCFS->AddProcess(P);
+	}
 }
 
 void Scheduler::UpdateInterface() {
@@ -377,7 +404,6 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
 	}
 	else {
-		cout << M << endl;
 		pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
 		if (Mode == Interactive) {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
@@ -391,6 +417,15 @@ void Scheduler::UpdateInterface() {
 int Scheduler::Get_TimeStep() {
 	return TimeStep;
 }
+Processor* Scheduler::GetSFCFS() const {
+	return SFCFS;
+}
+Processor* Scheduler::GetSSJF() const {
+	return SSJF;
+}
+Processor* Scheduler::GetSRR() const {
+	return SRR;
+}
 Input* Scheduler::getInput() {
 	return pIn;
 }
@@ -398,7 +433,6 @@ Output* Scheduler::getOutput() {
 	return pOut;
 }
 Scheduler::~Scheduler() {
-	delete IDs;
 	delete pIn;
 	delete pOut;
 	Process* p = nullptr;

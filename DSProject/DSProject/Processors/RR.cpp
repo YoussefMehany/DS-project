@@ -86,6 +86,8 @@ void RR::Lose(Process*& Stolen) {
 void RR::RRMigration() {
 
 	if (S->Get_NS()) { //Don't enter if no SJF exists 
+		S->DecideShortestSpecific(1);
+		if (!S->GetSSJF()) return;
 		while (R->GetCPURemainingTime() < S->Get_RTF()) { //Migrate Multiple Processes in the same time step until a process has Remaining Time less than RTF
 			
 			S->RRMigration(R);

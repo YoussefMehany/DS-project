@@ -35,10 +35,10 @@ void FCFS::ScheduleAlgo() {
 		if (N_TEMP == N) {
 			if (R) {
 				R->SetProcessor(nullptr);
-				S->TO_SHORTEST_RDY(R);
+				S->TO_SHORTEST_RDY(R, true);
 			}
 			while (RDY_LIST.RemoveHead(R))
-				S->TO_SHORTEST_RDY(R);
+				S->TO_SHORTEST_RDY(R, true);
 			R = nullptr;
 			QFT = 0;
 		}
@@ -103,6 +103,8 @@ void FCFS::Kill(int PID) {
 void FCFS::FCFSMigration() {
 
 	if (S->Get_NR() && !R->GetParent()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
+		S->DecideShortestSpecific(2);
+		if (!S->GetSRR()) return; //return if the RR processors are OverHeated
 		while (R->GetCurrWaitingTime() > S->Get_MaxW()) { //Migrate Multiple Processes in the same time step until a process have Waiting Time less than MaxW
 
 			S->FCFSMigration(R);

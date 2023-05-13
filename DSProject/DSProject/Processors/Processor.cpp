@@ -1,6 +1,7 @@
 #include "Processor.h"
 
 int Processor::Counter = 0;
+
 Processor::Processor(Scheduler* Sched, int n)
 	:S(Sched), QFT(0), State(IDLE), ID(++Counter), R(nullptr), TIT(0), TBT(0), pLoad(0), pUtil(0), N_TEMP(n), N(n) {}
 
@@ -24,6 +25,14 @@ Process* Processor::Get_Run()const {
 int Processor::GET_QFT()const{
 	return QFT;
 }
+int Processor::Get_HeatFactor()const {
+	return N_TEMP;
+}
+
+void Processor::Reset_HeatFactor() {
+	N_TEMP = N;
+}
+
 double Processor::Get_pUtil() const {
 	return (double(TBT) / (TIT + TBT)) * 100;
 }

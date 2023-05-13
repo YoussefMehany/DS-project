@@ -6,7 +6,7 @@ class Scheduler;
 class Processor {
 
 protected:
-	static int Counter;
+	static int Counter, OverHeated;
 	int QFT, ID, TBT, TIT,N_TEMP, N; //TBT->Total Busy Time ,TIT->Total Idle Time, QFT->Queue Finish Time, N timesteps for overheating
 	double pLoad, pUtil;
 	Process* R;
@@ -21,6 +21,8 @@ public:
 	double Get_pUtil() const;
 	double Get_pLoad() const;
 	int GET_QFT()const;
+	int Get_HeatFactor()const;
+	void Reset_HeatFactor();
 	void UpdateState();
 	void SetProcessorState(ProcessorState processor_state);
 	ProcessorState Get_State()const;
