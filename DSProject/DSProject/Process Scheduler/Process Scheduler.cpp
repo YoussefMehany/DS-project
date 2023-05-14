@@ -220,23 +220,25 @@ int Scheduler::Get_NR()  const {
 int Scheduler::Get_NS()  const {
 	return NS;
 }
-void Scheduler::FCFSMigration(Process* Migrate) {
-	Migrate->SetState(RDy);
-	Migrate->GetProcessor()->UpdateState();
-	Migrate->SetProcessor(nullptr);
-	SRR->AddProcess(Migrate);
-	ProcessesMaxW++;
+void Scheduler::FCFSMigration(Process* Migrated) {
+	Migrated->SetState(RDy);
+	Migrated->GetProcessor()->UpdateState();
+	Migrated->SetProcessor(nullptr);
+	SRR->AddProcess(Migrated);
+	ProcessesMaxW += !Migrated->WasMigratedFCFS();
+	Migrated->FMigrate();
 }
 //////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////// RR->SJF Migration ////////////////////////////////
 
-void Scheduler::RRMigration(Process* Migrate) {
-	Migrate->SetState(RDy);
-	Migrate->GetProcessor()->UpdateState();
-	Migrate->SetProcessor(nullptr);
-	SSJF->AddProcess(Migrate);
-	ProcessesRTF++;
+void Scheduler::RRMigration(Process* Migrated) {
+	Migrated->SetState(RDy);
+	Migrated->GetProcessor()->UpdateState();
+	Migrated->SetProcessor(nullptr);
+	SSJF->AddProcess(Migrated);
+	ProcessesRTF += !Migrated->WasMigratedRR();
+	Migrated->RMigrate();
 }
 
 //////////////////////////////////////////////////////////////////////////////////
