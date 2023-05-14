@@ -8,7 +8,7 @@ class Processor;
 class Process
 {
 private:
-	Queue<Pair<int, int>*> IO_LIST; //Queue or Pri ? not specified in the document
+	Queue<Pair<int, int>*> IO_LIST; 
 	static int counter, TTAT, LastID;
 	int PID;
 	int TIOD; // Total IO Duration
@@ -18,14 +18,14 @@ private:
 	int TerminationTime;
 	int TurnAroundDuration;
 	int WaitingTime;
-	int LastRunTime;
+	int Ex_DeadLine;
 	ProcessState State;
 	Processor* RunProcessor;
 	Process* Lchild, *Rchild, *Parent;
 public:
 	Process();
 	friend ostream& operator<<(ostream& out,const Process& process);
-	Process(int ArrivalTime, int CPUTime, int PID = -1);
+	Process(int ArrivalTime, int CPUTime,int Deadline ,int PID = -1);
 	int GetPID()const;
 	int GetArrivalTime()const;
 	int GetCPUTime()const;
@@ -36,13 +36,13 @@ public:
 	int GetWaitingTime()const;
 	int GetCurrWaitingTime(int TimeStep)const;
 	int GetCPURemainingTime()const;
+	int GetDeadLine()const;
 	Pair<int, int>* GetIO();
 	Process* GetLeftChild()const;
 	Process* GetRightChild()const;
 	Process* GetParent()const;
 	Processor* GetProcessor()const;
 	ProcessState GetState()const;
-	void AddWaitingTime(int Time);
 	void SetTerminationTime(int TerminationTime);
 	void SetResponseTime(int FirstTime);
 	void SetTurnAroundDuration();

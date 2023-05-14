@@ -3,14 +3,15 @@
 #include "../Processors/FCFS.h"
 #include "../Processors/RR.h"
 #include "../Processors/SJF.h"
+#include "../Processors/EDF.h"
 #include <iomanip>
 #include <windows.h>
 
 Scheduler::Scheduler() {
-	TimeStep = NS = NF = NR = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = 0;
+	TimeStep = NS = NF = NR = ND = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = 0;
 	Heat_Prob = 2;
 	MultiProcessor = nullptr;
-	LQ = SQ = SFCFS = SSJF = SRR = nullptr;
+	LQ = SQ = SFCFS = SSJF = SRR = SEDF = nullptr;
 	pIn = new Input;
 	pOut = new Output;
 	Mode = Interactive;
@@ -19,8 +20,8 @@ Scheduler::Scheduler() {
 void Scheduler::Set_Mode(InterfaceMode mode) {
 	Mode = mode;
 }
-void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR, int n) {
-	Num_of_Processors = FCFScnt + SJFcnt + RRcnt;
+void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int EDFcnt, int TSR, int n) {
+	Num_of_Processors = FCFScnt + SJFcnt + RRcnt + EDFcnt;
 	MultiProcessor = new Processor * [Num_of_Processors];
 	int cnt = 0;
 	while (FCFScnt--) {
@@ -32,6 +33,9 @@ void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int TSR, int n
 	while (RRcnt--) {
 		MultiProcessor[cnt++] = new RR(this, TSR, n);
 	}
+	while (EDFcnt--) {
+		MultiProcessor[cnt++] = new EDF(this, n);
+	}
 }
 
 void Scheduler::WriteData() {
@@ -42,12 +46,15 @@ void Scheduler::WriteData() {
 	Process* p = nullptr;
 	Queue<Process*> TRMT = TRM;
 	int AvgResponseTime = 0, AvgWaitingTime = 0, AvgTurnAroundTime = 0;
+	int Early = 0; 
 	double AvgUtil = 0;
 	while (TRMT.dequeue(p)) {
 		p->PrintOutFile(OutFile);
 		AvgResponseTime += p->GetResponseTime();
 		AvgWaitingTime += p->GetWaitingTime();
 		AvgTurnAroundTime += p->GetTurnAroundDuration();
+		if (p->GetTerminationTime() < p->GetDeadLine())
+			Early++;
 	}
 	AvgResponseTime /= TRM.GetSize();
 	AvgWaitingTime /= TRM.GetSize();
@@ -58,7 +65,9 @@ void Scheduler::WriteData() {
 	double forked_per = 100 * (double)(M - INIT_M) / M;
 	OutFile << fixed << setprecision(3) << "Migration %:\t\tRTF= " << 100.0 * ProcessesRTF / M <<
 		"%,\t\tMaxW = " << 100.0 * ProcessesMaxW / M <<
-		"%\nWork Steal: " << 100.0 * ProcessesStolen / M << "%\nForked Process: " << forked_per;
+		"%\nWork Steal: " << 100.0 * ProcessesStolen / M << "%\nForked Process: " << forked_per <<
+		"\nEarly Completed: " << 100.0 * Early / M;
+
 
 
 	OutFile << "%\nProcessors: " << Num_of_Processors << " [" << NF << " FCFS, "
@@ -86,15 +95,15 @@ void Scheduler::Get_Data() {
 	pOut->PrintOut("Enter File name: ");
 	pIn->GetFileName(Filename);
 	pOut->ClearConsole();
-	InFile.open(Filename +".txt");
+	InFile.open(Filename + ".txt");
 	pOut->PrintOut("Processing Input Data...\n");
 	Sleep(500);
-	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
+	InFile >> NF >> NS >> NR >> ND >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
 	M = INIT_M;
 	for (int i = 0; i < INIT_M; i++) {
-		int AT, ID, CPU, N_IO, IO_R, IO_D, sum_IOD = 0;
-		InFile >> AT >> ID >> CPU >> N_IO;
-		Process* process = new Process(AT, CPU, ID);
+		int AT, ID, CPU, N_IO, IO_R, IO_D, sum_IOD = 0, DeadLine;
+		InFile >> AT >> ID >> CPU >> DeadLine >> N_IO;
+		Process* process = new Process(AT, CPU, DeadLine, ID);
 		while (N_IO--) {
 			char dummy;
 			InFile >> dummy >> IO_R >> dummy >> IO_D >> dummy;
@@ -105,7 +114,7 @@ void Scheduler::Get_Data() {
 		process->SetTIOD(sum_IOD);
 		NEW.enqueue(process);
 	}
-	AddProcessors(NF, NS, NR, TSR, n);
+	AddProcessors(NF, NS, NR, ND, TSR, n);
 	int T, PID;
 	while (InFile >> T) {
 		InFile >> PID;
@@ -164,7 +173,7 @@ bool Scheduler::Simulation() {
 
 	if (!(TimeStep % STL) && Num_of_Processors)
 		WorkStealing();
-	 
+
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
 
 
@@ -240,7 +249,7 @@ Processor* Scheduler::GetSQ() const {
 void Scheduler::WorkStealing() {
 
 	DecideLongest();
-	DecideShortest(3);
+	DecideShortest(4);
 
 	Process* Stolen = nullptr;
 	if (!LQ) return;
@@ -287,9 +296,10 @@ void Scheduler::DecideLongest() {
 
 
 void Scheduler::DecideShortest(int Type) { //decide the shortest queue of a specific type depending on the argument sent
-	//Types: FCFS: 0, SJF: 1, RR: 2, SQ : 3
+	//Types: FCFS: 0, SJF: 1, RR: 2, EDF: 3 ,SQ : 4
 	int CPU_Min = INT_MAX;
-	(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : SQ) = nullptr;
+
+	(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : Type == 3? SEDF : SQ) = nullptr;
 	int index = -1;
 	for (int i = 0; i < Num_of_Processors; i++) {
 		int QFT = INT_MAX;
@@ -300,10 +310,13 @@ void Scheduler::DecideShortest(int Type) { //decide the shortest queue of a spec
 		else if (Type == 1) {
 			dynamic = dynamic_cast<SJF*>(MultiProcessor[i]);
 		}
-		else {
+		else if (Type == 2) {
 			dynamic = dynamic_cast<RR*>(MultiProcessor[i]);
 		}
-		if ((dynamic || Type == 3) && MultiProcessor[i]->Get_State() != STOP)
+		else {
+			dynamic = dynamic_cast<EDF*>(MultiProcessor[i]);
+		}
+		if ((dynamic || Type == 4) && MultiProcessor[i]->Get_State() != STOP)
 			QFT = MultiProcessor[i]->GET_QFT();
 		if (QFT < CPU_Min) {
 			index = i;
@@ -311,11 +324,11 @@ void Scheduler::DecideShortest(int Type) { //decide the shortest queue of a spec
 		}
 	}
 	if (~index)
-		(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : SQ) = MultiProcessor[index];
+		(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : Type == 3 ? SEDF : SQ) = MultiProcessor[index];
 }
 
-Process* Scheduler::AddChildToSQ(int RemCPU) {
-	Process* child = new Process(TimeStep, RemCPU);
+Process* Scheduler::AddChildToSQ(int RemCPU,int DeadLine) {
+	Process* child = new Process(TimeStep, RemCPU, DeadLine);
 	CoolingSystem(true);
 	DecideShortest(0);
 	SFCFS->AddProcess(child);
@@ -363,7 +376,7 @@ void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 	P->SetState(RDy);
 	if (!fcfs) {
 		CoolingSystem();   ///Check if all processors are in STOP state, then cool the least heated one
-		DecideShortest(3);
+		DecideShortest(4);
 		SQ->AddProcess(P);
 	}
 	else {
@@ -392,8 +405,8 @@ void Scheduler::UpdateInterface() {
 			getc(stdin);
 		}
 		else Sleep(50);
-		if (TRM.GetSize() != M)
-			pOut->ClearConsole();
+		/*if (TRM.GetSize() != M)
+			pOut->ClearConsole();*/
 	}
 }
 int Scheduler::Get_TimeStep() {

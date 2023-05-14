@@ -29,6 +29,7 @@
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Process Scheduler\Process Scheduler.h" />
     <ClInclude Include="Processors\FCFS.h" />
+    <ClInclude Include="Processors\EDF.h" />
     <ClInclude Include="Processors\Processor.h" />
     <ClInclude Include="Processors\RR.h" />
     <ClInclude Include="Processors\SJF.h" />
@@ -43,6 +44,7 @@
     <ClCompile Include="Processors\Processor.cpp" />
     <ClCompile Include="Processors\RR.cpp" />
     <ClCompile Include="Processors\SJF.cpp" />
+    <ClCompile Include="Processors\EDF.cpp" />
     <ClCompile Include="Process\Process.cpp" />
     <ClCompile Include="UI Classes\Input.cpp" />
     <ClCompile Include="UI Classes\Output.cpp" />

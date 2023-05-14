@@ -1,10 +1,10 @@
-#include "SJF.h"
+#include "EDF.h"
 #include "../Process Scheduler/Process Scheduler.h"
 
 
-SJF::SJF(Scheduler* Sched, int n)
+EDF::EDF(Scheduler* Sched, int n)
 	:Processor(Sched, n) {}
-void SJF::ScheduleAlgo() {
+void EDF::ScheduleAlgo() {
 
 	if (State == IDLE && RDY_LIST.dequeue(R)) {
 
@@ -13,17 +13,22 @@ void SJF::ScheduleAlgo() {
 		State = BUSY;
 
 		R->SetState(RUn);
+
 		QFT -= R->GetCPURemainingTime();
 	}
 	if (State == BUSY) {
+
 		TBT++;
+
 		R->UpdateInfo();
+
 		if (!R->GetCPURemainingTime())
 			S->TO_TRM(R);
 
-		else if (R->GetIO() && !R->GetIO()->getFirst())
-			S->TO_BLK(R);
-
+		///As Explained in the document the processes in the EDF run until it finishes or a new process with an earlier deadline arrives
+		///so it wont go to the BLK for IO.
+		///The only chance that a process can go to BLK after entering the EDF is when the processor gets overheated so all 
+		///the processes will go to another processors and make the remaining IOs, or anthor processor Steals from it.
 	}
 	else if (State == STOP) {
 		if (N_TEMP == N) {
@@ -54,20 +59,27 @@ void SJF::ScheduleAlgo() {
 	else TIT++;
 
 }
-void SJF::AddProcess(Process* process) {
+void EDF::AddProcess(Process* process) {
 	UpdateState();
 	process->SetProcessor(this);
-	RDY_LIST.enqueue(process, process->GetCPURemainingTime());
+
+	if (State == BUSY && process->GetDeadLine() < R->GetDeadLine()) {
+		swap(process, R);
+		R->SetState(RUn);
+		process->SetState(RDy);
+	}
+
+	RDY_LIST.enqueue(process, process->GetDeadLine());
 	QFT += process->GetCPURemainingTime();
 }
-void SJF::Print() {
+void EDF::Print() {
 	Output* pOut = S->getOutput();
 	pOut->PrintColor(State == STOP ? RED : State == BUSY ? GREEN : WHITE);
 	pOut->PrintOut("Processor " + to_string(ID));
-	pOut->PrintOut("[SJF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
+	pOut->PrintOut("[EDF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
 	RDY_LIST.Print();
 }
-void SJF::Lose(Process*& Stolen) {
+void EDF::Lose(Process*& Stolen) {
 	RDY_LIST.dequeue(Stolen);
 	QFT -= Stolen->GetCPURemainingTime();
 }

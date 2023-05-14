@@ -68,6 +68,9 @@
     <ClInclude Include="Data Structures\TreeNode.h">
       <Filter>Data Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Processors\EDF.h">
+      <Filter>Processors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Process\Process.cpp">
@@ -94,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="UI Classes\Output.cpp">
       <Filter>UI classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Processors\EDF.cpp">
+      <Filter>Processors</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

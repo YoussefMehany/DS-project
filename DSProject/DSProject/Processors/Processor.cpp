@@ -6,7 +6,7 @@ Processor::Processor(Scheduler* Sched, int n)
 	:S(Sched), QFT(0), State(IDLE), ID(++Counter), R(nullptr), TIT(0), TBT(0), pLoad(0), pUtil(0), N_TEMP(n), N(n) {}
 
 void Processor::UpdateState() {
-	if (!R || R->GetState() != RUn) {
+	if (!R || (R->GetState() != RUn && R->GetState() != ORPH)) {
 		State = IDLE;
 		R = nullptr;
 	}

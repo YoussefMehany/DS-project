@@ -4,16 +4,16 @@ int Process::TTAT = 0;
 int Process::LastID = 0;
 Process::Process() {
 	PID = CPUTime = ArrivalTime = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime =  0;
-	LastRunTime = 1;
 	State = NEW;
 	Parent = Lchild = Rchild = nullptr;
 	RunProcessor = nullptr;
 }
-Process::Process(int ArrivalTime, int CPUTime, int PID) {
+Process::Process(int ArrivalTime, int CPUTime,int Deadline ,int PID) {
 	this->ArrivalTime = ArrivalTime;
 	this->CPUTime = CPUTime;
 	CPUTemp = CPUTime;
-	TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
+	Ex_DeadLine= Deadline;
+	TIOD = TerminationTime = TurnAroundDuration = WaitingTime = ResponseTime = 0;
 	if (~PID) {
 		this->PID = PID;
 		LastID = PID;
@@ -49,9 +49,11 @@ int Process::GetTurnAroundDuration()const {
 int Process::GetWaitingTime()const {
 	return WaitingTime;
 }
-int Process::GetTIOD()const
-{
+int Process::GetTIOD()const{
 	return TIOD;
+}
+int Process::GetDeadLine()const {
+	return Ex_DeadLine;
 }
 int Process::GetCPURemainingTime()const {
 	return CPUTemp;
@@ -88,7 +90,7 @@ void Process::SetResponseTime(int TimeFirst) {
 	ResponseTime = TimeFirst - ArrivalTime;
 }
 void Process::SetTurnAroundDuration() {
-	TurnAroundDuration = TerminationTime - ArrivalTime;
+	TurnAroundDuration = TerminationTime - ArrivalTime + 1;
 	TTAT += TurnAroundDuration;
 }
 int Process::GetTTAT() {
@@ -126,8 +128,13 @@ void Process::UpdateInfo() {
 
 	Pair<int, int>* IO = nullptr;
 	IO_LIST.peek(IO);
-	if (IO && IO->getFirst())
-		IO->SetFirst(IO->getFirst() - 1);
+
+	if (IO)
+		if (!IO->getFirst())      ///If we entered and found out that the IO_R is 0 this means that this process is scheduled by EDF so it wont make an IO so we 
+			IO_LIST.dequeue(IO); ///Removed it here so that when it goes to another one it make the remaining IOs 
+		else 
+			IO->SetFirst(IO->getFirst() - 1);
+		
 }
 void Process::SetChildrenState(bool par) { //to set all children states to be orphans
 	if (Parent) {

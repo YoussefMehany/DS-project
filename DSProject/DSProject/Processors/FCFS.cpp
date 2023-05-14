@@ -21,6 +21,7 @@ void FCFS::ScheduleAlgo() {
 	if (State == BUSY) {
 
 		TBT++;
+
 		R->UpdateInfo();
 
 		if (!R->GetCPURemainingTime()) {
@@ -136,7 +137,7 @@ void FCFS::Forking() {
 	int FP = S->Get_FP();
 	int Rand = 1 + rand() % 100;
 	if (R && Rand <= FP && (!R->GetLeftChild() || !R->GetRightChild())) {
-		Process* child = S->AddChildToSQ(R->GetCPURemainingTime());
+		Process* child = S->AddChildToSQ(R->GetCPURemainingTime(),R->GetDeadLine());
 		if (!R->GetLeftChild()) {
 			R->SetLeftChild(child);
 		}
