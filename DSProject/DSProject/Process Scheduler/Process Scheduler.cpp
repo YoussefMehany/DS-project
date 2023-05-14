@@ -8,7 +8,7 @@
 #include <windows.h>
 
 Scheduler::Scheduler() {
-	TimeStep = NS = NF = NR = ND = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = 0;
+	TimeStep = NS = NF = NR = ND = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = ProcessesKilled = 0;
 	Heat_Prob = 2;
 	MultiProcessor = nullptr;
 	LQ = SQ = SFCFS = SSJF = SRR = SEDF = nullptr;
@@ -66,12 +66,10 @@ void Scheduler::WriteData() {
 	OutFile << fixed << setprecision(3) << "Migration %:\t\tRTF= " << 100.0 * ProcessesRTF / M <<
 		"%,\t\tMaxW = " << 100.0 * ProcessesMaxW / M <<
 		"%\nWork Steal: " << 100.0 * ProcessesStolen / M << "%\nForked Process: " << forked_per <<
-		"\nEarly Completed: " << 100.0 * Early / M;
-
-
-
+		"%\nKilled Processes: "<<100.0*ProcessesKilled / M <<
+		"%\nEarly Completed: " << 100.0 * Early / M;
 	OutFile << "%\nProcessors: " << Num_of_Processors << " [" << NF << " FCFS, "
-		<< NS << " SJF, " << NR << " RR]\n";
+		<< NS << " SJF, " << NR << " RR, "<<ND<<" EDF]\n";
 	OutFile << "Processors Load\n";
 	for (int i = 0; i < Num_of_Processors; i++) {
 		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pLoad() << "%";
@@ -97,7 +95,7 @@ void Scheduler::Get_Data() {
 	pOut->ClearConsole();
 	InFile.open(Filename + ".txt");
 	pOut->PrintOut("Processing Input Data...\n");
-	Sleep(500);
+	Sleep(750);
 	InFile >> NF >> NS >> NR >> ND >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
 	M = INIT_M;
 	for (int i = 0; i < INIT_M; i++) {
@@ -197,8 +195,10 @@ bool Scheduler::Simulation() {
 	if (Kill && Kill->getFirst() == TimeStep) {
 		KILLSIG.dequeue(Kill);
 		for (int i = 0; i < Num_of_Processors; i++) {
-			if (dynamic_cast<FCFS*>(MultiProcessor[i]))  //KILL From FCFS Only , else Ignore the Signal
+			if (dynamic_cast<FCFS*>(MultiProcessor[i])) {  //KILL From FCFS Only , else Ignore the Signal
 				((FCFS*)MultiProcessor[i])->Kill(Kill->getSecond());
+				ProcessesKilled++;
+			}
 		}
 	}
 	return true;
@@ -404,9 +404,9 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(50);
-		/*if (TRM.GetSize() != M)
-			pOut->ClearConsole();*/
+		else Sleep(300);
+		if (TRM.GetSize() != M)
+			pOut->ClearConsole();
 	}
 }
 int Scheduler::Get_TimeStep() {

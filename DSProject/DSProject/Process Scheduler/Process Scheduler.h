@@ -19,7 +19,7 @@ class Scheduler
 	Output* pOut;
 	int TimeStep;
 	int NS, NF, NR, ND, RTF, M, INIT_M, MaxW, STL, Fork_Prob, Heat_Prob, n;
-	int ProcessesRTF, ProcessesMaxW, ProcessesStolen;
+	int ProcessesRTF, ProcessesMaxW, ProcessesStolen, ProcessesKilled;
 	int Num_of_Processors; //Total number of processors
 	int TTAT; //Total TurnAround time
 	Queue<Process*>NEW, BLK, TRM;
