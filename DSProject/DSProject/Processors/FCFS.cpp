@@ -83,6 +83,7 @@ void FCFS::AddProcess(Process* process) {
 }
 void FCFS::Print() {
 	Output* pOut = S->getOutput();
+	pOut->PrintColor(State == STOP ? RED : State == BUSY ? GREEN : WHITE);
 	pOut->PrintOut("Processor " + to_string(ID));
 	pOut->PrintOut("[FCFS]: " + to_string(RDY_LIST.size()) + " RDY: ");
 	RDY_LIST.print();
@@ -135,7 +136,7 @@ void FCFS::Forking() {
 	int FP = S->Get_FP();
 	int Rand = 1 + rand() % 100;
 	if (R && Rand <= FP && (!R->GetLeftChild() || !R->GetRightChild())) {
-		Process* child = S->AddChildToSQ(R->GetArrivalTime(), R->GetCPURemainingTime());
+		Process* child = S->AddChildToSQ(R->GetCPURemainingTime());
 		if (!R->GetLeftChild()) {
 			R->SetLeftChild(child);
 		}

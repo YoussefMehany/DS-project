@@ -18,3 +18,15 @@ enum InterfaceMode
 	SBS,
 	Silent
 };
+enum Color
+{
+	RED,
+	YELLOW,
+	WHITE,
+	BOLDMAG,
+	MAGENTA,
+	ORANGE,
+	GREEN,
+	CYAN,
+	BLUE
+};

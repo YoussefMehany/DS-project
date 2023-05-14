@@ -83,8 +83,12 @@ void Scheduler::WriteData() {
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
+	pOut->PrintOut("Enter File name: ");
 	pIn->GetFileName(Filename);
+	pOut->ClearConsole();
 	InFile.open(Filename +".txt");
+	pOut->PrintOut("Processing Input Data...\n");
+	Sleep(500);
 	InFile >> NF >> NS >> NR >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
 	M = INIT_M;
 	for (int i = 0; i < INIT_M; i++) {
@@ -108,13 +112,13 @@ void Scheduler::Get_Data() {
 		Pair<int, int>* kill = new Pair<int, int>(T, PID);
 		KILLSIG.enqueue(kill);
 	}
-	system("CLS");
+	pOut->ClearConsole();
 	int x = 1;
 	pOut->PrintOut("Please Enter The Mode of The Interface :\n");
 	pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
 	pIn->GetInput(x);
 	Mode = InterfaceMode(x - 1);
-	system("CLS");
+	pOut->ClearConsole();
 }
 
 bool Scheduler::Simulation() {
@@ -310,8 +314,8 @@ void Scheduler::DecideShortest(int Type) { //decide the shortest queue of a spec
 		(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : SQ) = MultiProcessor[index];
 }
 
-Process* Scheduler::AddChildToSQ(int ArrivalT, int RemCPU) {
-	Process* child = new Process(ArrivalT, RemCPU);
+Process* Scheduler::AddChildToSQ(int RemCPU) {
+	Process* child = new Process(TimeStep, RemCPU);
 	CoolingSystem(true);
 	DecideShortest(0);
 	SFCFS->AddProcess(child);
@@ -372,7 +376,7 @@ void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 void Scheduler::UpdateInterface() {
 
 	if (TRM.GetSize() == M) {
-		pOut->PrintOut("Simulation ends, Output file is created\n");
+		pOut->PrintOut("Simulation ended, Output file is created\n");
 		return;
 	}
 
@@ -389,7 +393,7 @@ void Scheduler::UpdateInterface() {
 		}
 		else Sleep(50);
 		if (TRM.GetSize() != M)
-			system("CLS");
+			pOut->ClearConsole();
 	}
 }
 int Scheduler::Get_TimeStep() {

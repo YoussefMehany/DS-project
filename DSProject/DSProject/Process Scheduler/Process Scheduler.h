@@ -43,7 +43,7 @@ public:
 	void RRMigration(Process* Migrate);
 	void DecideLongest();
 	void DecideShortest(int Type);
-	Process* AddChildToSQ(int ArrivalT, int RemCPU);
+	Process* AddChildToSQ(int RemCPU);
 	int Get_TimeStep();
 	int Get_MaxW() const;
 	int Get_FP() const;
