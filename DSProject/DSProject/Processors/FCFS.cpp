@@ -84,9 +84,10 @@ void FCFS::AddProcess(Process* process) {
 }
 void FCFS::Print() {
 	Output* pOut = S->getOutput();
-	pOut->PrintColor(State == STOP ? RED : State == BUSY ? GREEN : WHITE);
-	pOut->PrintOut("Processor " + to_string(ID));
-	pOut->PrintOut("[FCFS]: " + to_string(RDY_LIST.size()) + " RDY: ");
+	Colors color = State == STOP ? RED : State == BUSY ? GREEN : WHITE;
+	pOut->PrintOut("Processor " + to_string(ID), color);
+	pOut->PrintOut("[FCFS]: " + to_string(RDY_LIST.size()) + " RDY: ", color);
+	pOut->PrintColor(color);
 	RDY_LIST.print();
 }
 void FCFS::Kill(int PID) {

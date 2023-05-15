@@ -2,16 +2,17 @@
 #include "../Processors/Processor.h"
 #include<iostream>
 #include<string>
-#include "tabulate/table.hpp"
-using namespace tabulate;
 using namespace std;
-using Row_t = Table::Row_t;
 class Output {
 public:
 	Output();
 	void PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BLK, Queue<Process*> TRM, int timestep);
-	void PrintOut(string word);
+	void PrintOut(string word, Colors color = WHITE);
+	void PrintShow(string word, int duration);
+	void LineBreaks(int count);
 	void ClearConsole();
 	void PrintColor(Colors clr);
-	void PrintReadme();
+	void PrintChar(char c, int count, Colors color = WHITE);
+	void Intro();
+	void ThankYou();
 };

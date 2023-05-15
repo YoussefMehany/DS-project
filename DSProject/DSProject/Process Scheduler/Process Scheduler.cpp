@@ -22,7 +22,7 @@ void Scheduler::Set_Mode(InterfaceMode mode) {
 }
 void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int EDFcnt, int TSR, int n) {
 	Num_of_Processors = FCFScnt + SJFcnt + RRcnt + EDFcnt;
-	MultiProcessor = new Processor * [Num_of_Processors];
+	MultiProcessor = new Processor* [Num_of_Processors];
 	int cnt = 0;
 	while (FCFScnt--) {
 		MultiProcessor[cnt++] = new FCFS(this, n);
@@ -39,9 +39,9 @@ void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int EDFcnt, in
 }
 
 void Scheduler::WriteData() {
-	pOut->PrintOut("Enter a name for output file : ");
+	pOut->PrintShow("Enter a name for output file : ", 20);
 	pIn->GetFileName(Filename);
-	OutFile.open(Filename + ".txt");
+	OutFile.open("Output Files/" + Filename + ".txt");
 	OutFile << "TT\tPID\tAT\tCT\tIO_D\tWT\tRT\tTRT\n";
 	Process* p = nullptr;
 	Queue<Process*> TRMT = TRM;
@@ -66,10 +66,10 @@ void Scheduler::WriteData() {
 	OutFile << fixed << setprecision(3) << "Migration %:\t\tRTF= " << 100.0 * ProcessesRTF / M <<
 		"%,\t\tMaxW = " << 100.0 * ProcessesMaxW / M <<
 		"%\nWork Steal: " << 100.0 * ProcessesStolen / M << "%\nForked Process: " << forked_per <<
-		"%\nKilled Processes: "<<100.0*ProcessesKilled / M <<
+		"%\nKilled Processes: " << 100.0 * ProcessesKilled / M <<
 		"%\nEarly Completed: " << 100.0 * Early / M;
 	OutFile << "%\nProcessors: " << Num_of_Processors << " [" << NF << " FCFS, "
-		<< NS << " SJF, " << NR << " RR, "<<ND<<" EDF]\n";
+		<< NS << " SJF, " << NR << " RR, "<< ND << " EDF]\n";
 	OutFile << "Processors Load\n";
 	for (int i = 0; i < Num_of_Processors; i++) {
 		OutFile << "p" << i + 1 << " = " << MultiProcessor[i]->Get_pLoad() << "%";
@@ -85,19 +85,22 @@ void Scheduler::WriteData() {
 	}
 	AvgUtil /= Num_of_Processors;
 	OutFile << "\nAvg Utilization = " << AvgUtil << "%\n";
-	pOut->PrintOut("File has been created , check it please.");
+	pOut->ClearConsole();
+	pOut->PrintShow("File has been created , check it please.", 20);
+	pOut->LineBreaks(11);
+	pOut->ThankYou();
+	pOut->LineBreaks(12);
 }
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
-	pOut->PrintReadme();
+	pOut->Intro();
 	pOut->PrintOut("Enter File name: ");
 	pIn->GetFileName(Filename);
 	pOut->ClearConsole();
-	pOut->PrintReadme();
-	InFile.open(Filename + ".txt");
-	pOut->PrintOut("Processing Input Data...\n");
-	Sleep(750);
+	InFile.open("Input Files/" + Filename + ".txt");
+	pOut->PrintShow("Processing Input Data", 20);
+	pOut->PrintShow("...", 300);
 	InFile >> NF >> NS >> NR >> ND >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
 	M = INIT_M;
 	for (int i = 0; i < INIT_M; i++) {
@@ -122,7 +125,6 @@ void Scheduler::Get_Data() {
 		KILLSIG.enqueue(kill);
 	}
 	pOut->ClearConsole();
-	pOut->PrintReadme();
 	int x = 1;
 	pOut->PrintOut("Please Enter The Mode of The Interface :\n");
 	pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
@@ -177,7 +179,6 @@ bool Scheduler::Simulation() {
 
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
 
-
 	for (int i = 0; i < Num_of_Processors; i++) {
 		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
 			((FCFS*)MultiProcessor[i])->RemoveOrphans();
@@ -191,7 +192,7 @@ bool Scheduler::Simulation() {
 			((FCFS*)MultiProcessor[i])->Forking();
 	}
 
-	////////////////////////////////// KILLSIG //////////////////////////////////////
+	////////////////////////////////// KILLSIG /////////////////////////////////////
 
 	Pair<int, int>* Kill = nullptr;
 	KILLSIG.peek(Kill);
@@ -223,6 +224,7 @@ int Scheduler::Get_NR()  const {
 int Scheduler::Get_NS()  const {
 	return NS;
 }
+
 void Scheduler::FCFSMigration(Process* Migrated) {
 	Migrated->SetState(RDy);
 	Migrated->GetProcessor()->UpdateState();
@@ -231,7 +233,6 @@ void Scheduler::FCFSMigration(Process* Migrated) {
 	ProcessesMaxW += !Migrated->WasMigratedFCFS();
 	Migrated->FMigrate();
 }
-//////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////// RR->SJF Migration ////////////////////////////////
 
@@ -243,8 +244,6 @@ void Scheduler::RRMigration(Process* Migrated) {
 	ProcessesRTF += !Migrated->WasMigratedRR();
 	Migrated->RMigrate();
 }
-
-//////////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////// WORK STEALING ////////////////////////////////
@@ -301,10 +300,10 @@ void Scheduler::DecideLongest() {
 
 
 void Scheduler::DecideShortest(int Type) { //decide the shortest queue of a specific type depending on the argument sent
-	//Types: FCFS: 0, SJF: 1, RR: 2, EDF: 3 ,SQ : 4
+	//Types: FCFS: 0, SJF: 1, RR: 2, EDF: 3, SQ: 4
 	int CPU_Min = INT_MAX;
 
-	(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : Type == 3? SEDF : SQ) = nullptr;
+	(Type == 0 ? SFCFS : Type == 1 ? SSJF : Type == 2 ? SRR : Type == 3 ? SEDF : SQ) = nullptr;
 	int index = -1;
 	for (int i = 0; i < Num_of_Processors; i++) {
 		int QFT = INT_MAX;
@@ -357,6 +356,7 @@ void Scheduler::TO_TRM(Process* P) {
 	P->SetProcessor(nullptr);
 	TRM.enqueue(P);
 }
+
 void Scheduler::CoolingSystem(bool fcfs) {
 	Processor* Coolest = nullptr;
 	int OverHeated = 0;
@@ -394,15 +394,14 @@ void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 void Scheduler::UpdateInterface() {
 	
 	if (TRM.GetSize() == M) {
-		pOut->PrintReadme();
-		pOut->PrintOut("Simulation ended, Output file is created\n");
+		pOut->PrintShow("Simulation ended, Output file is created\n", 20);
 		return;
 	}
 
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
-			pOut->PrintOut("Silent Mode............ Simulation Starts..........\n");
+			pOut->PrintShow("Silent Mode............ Simulation Starts..........\n", 20);
 	}
 	else {
 		pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
@@ -410,7 +409,7 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(100);
+		else Sleep(200);
 		if (TRM.GetSize() != M)
 			pOut->ClearConsole();
 	}

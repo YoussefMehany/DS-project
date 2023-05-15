@@ -74,9 +74,10 @@ void EDF::AddProcess(Process* process) {
 }
 void EDF::Print() {
 	Output* pOut = S->getOutput();
-	pOut->PrintColor(State == STOP ? RED : State == BUSY ? GREEN : WHITE);
-	pOut->PrintOut("Processor " + to_string(ID));
-	pOut->PrintOut("[EDF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
+	Colors color = State == STOP ? RED : State == BUSY ? GREEN : WHITE;
+	pOut->PrintOut("Processor " + to_string(ID), color);
+	pOut->PrintOut("[EDF]: " + to_string(RDY_LIST.getSize()) + " RDY: ", color);
+	pOut->PrintColor(color);
 	RDY_LIST.Print();
 }
 void EDF::Lose(Process*& Stolen) {

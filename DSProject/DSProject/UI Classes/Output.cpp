@@ -1,4 +1,5 @@
 #include "Output.h"
+#include <Windows.h>
 
 Output::Output() {}
 
@@ -76,30 +77,112 @@ void Output::PrintColor(Colors clr) {
 void Output::ClearConsole() {
 	system("CLS");
 }
-void Output::PrintOut(string word) {
+void Output::PrintOut(string word, Colors color) {
+	PrintColor(color);
 	cout << word;
+	PrintColor(WHITE);
 }
-void Output::PrintReadme() {
-	Table readme;
-	readme.format().border_color(Color::yellow);
-
-	readme.add_row(Row_t{ "Process Scheduler" });
-	readme[0].format().font_align(FontAlign::center).font_color(Color::yellow);
-
-	readme.add_row(Row_t{ "https://github.com/YoussefMehany/DS-project" });
-	readme[1]
-		.format()
-		.font_align(FontAlign::center)
-		.font_style({ FontStyle::underline, FontStyle::italic })
-		.font_color(Color::white)
-		.hide_border_top();
-
-	readme.add_row(Row_t{ "This is the project of CMP1040 (Data Structures and Algorithms) course , The contributors are :" });
-	readme[2].format().font_style({ FontStyle::italic }).font_color(Color::magenta);
-
-	Table highlights;
-	highlights.add_row(Row_t{ "Marwan Muhammad", "Youssef Tarek", "Muhammad Amr" });
-	readme.add_row(Row_t{ highlights });
-	readme[3].format().font_align(FontAlign::center).hide_border_top();
-	cout << readme<<'\n';
+void Output::LineBreaks(int count) {
+	for (int i = 0; i < count; i++) {
+		cout << '\n';
+	}
+}
+void Output::PrintShow(string word, int duration) {
+	for (int i = 0; i < word.size(); i++) {
+		cout << word[i];
+		Sleep(duration);
+	}
+}
+void Output::PrintChar(char c, int count, Colors color) {
+	PrintColor(color);
+	for (int i = 0; i < count; i++) {
+		cout << c;
+	}
+	PrintColor(WHITE);
+}
+void Output::Intro() {
+	PrintChar(' ', 10);
+	PrintOut("+");
+	PrintChar('-', 97, YELLOW);
+	PrintOut("+");
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 40);
+	PrintOut("Process Scheduler", CYAN);
+	PrintChar(' ', 40);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 27);
+	PrintOut("https://github.com/YoussefMehany/DS-project");
+	PrintChar(' ', 27);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("+");
+	PrintChar('-', 97, YELLOW);
+	PrintOut("+");
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 1);
+	PrintOut("This is the project of CMP1040 (Data Structures and Algorithms) course , The contributors are:", RED);
+	PrintChar(' ', 2);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 97);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 25);
+	PrintOut("Marwan Muhammad | Youssef Tarek | Muhammad Amr");
+	PrintChar(' ', 26);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 97);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 10);
+	PrintOut("\n");
+	PrintChar(' ', 10);
+	PrintOut("+");
+	PrintChar('-', 97, YELLOW);
+	PrintOut("+");
+	PrintChar(' ', 10);
+	PrintChar('\n', 2);
+}
+void Output::ThankYou() {
+	PrintChar(' ', 40);
+	PrintOut("+");
+	PrintChar('-', 38, YELLOW);
+	PrintOut("+");
+	PrintChar(' ', 40);
+	PrintOut("\n");
+	PrintChar(' ', 40);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 14);
+	PrintOut("Thank You!", CYAN);
+	PrintChar(' ', 14);
+	PrintOut("|", YELLOW);
+	PrintChar(' ', 40);
+	PrintOut("\n");
+	PrintChar(' ', 40);
+	PrintOut("+");
+	PrintChar('-', 38, YELLOW);
+	PrintOut("+");
+	PrintChar(' ', 40);
+	PrintOut("\n");
 }

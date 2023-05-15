@@ -62,9 +62,10 @@ void SJF::AddProcess(Process* process) {
 }
 void SJF::Print() {
 	Output* pOut = S->getOutput();
-	pOut->PrintColor(State == STOP ? RED : State == BUSY ? GREEN : WHITE);
-	pOut->PrintOut("Processor " + to_string(ID));
-	pOut->PrintOut("[SJF]: " + to_string(RDY_LIST.getSize()) + " RDY: ");
+	Colors color = State == STOP ? RED : State == BUSY ? GREEN : WHITE;
+	pOut->PrintOut("Processor " + to_string(ID), color);
+	pOut->PrintOut("[SJF]: " + to_string(RDY_LIST.getSize()) + " RDY: ", color);
+	pOut->PrintColor(color);
 	RDY_LIST.Print();
 }
 void SJF::Lose(Process*& Stolen) {
