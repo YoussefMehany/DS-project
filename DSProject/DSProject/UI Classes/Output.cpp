@@ -41,7 +41,7 @@ void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BL
 	cout << endl;
 	PrintColor(WHITE);
 }
-void Output::PrintColor(Color clr) {
+void Output::PrintColor(Colors clr) {
 	switch (clr) {
 		case BOLDMAG:
 			cout << "\033[1m\033[35m";
@@ -78,4 +78,28 @@ void Output::ClearConsole() {
 }
 void Output::PrintOut(string word) {
 	cout << word;
+}
+void Output::PrintReadme() {
+	Table readme;
+	readme.format().border_color(Color::yellow);
+
+	readme.add_row(Row_t{ "Process Scheduler" });
+	readme[0].format().font_align(FontAlign::center).font_color(Color::yellow);
+
+	readme.add_row(Row_t{ "https://github.com/YoussefMehany/DS-project" });
+	readme[1]
+		.format()
+		.font_align(FontAlign::center)
+		.font_style({ FontStyle::underline, FontStyle::italic })
+		.font_color(Color::white)
+		.hide_border_top();
+
+	readme.add_row(Row_t{ "This is the project of CMP1040 (Data Structures and Algorithms) course , The contributors are :" });
+	readme[2].format().font_style({ FontStyle::italic }).font_color(Color::magenta);
+
+	Table highlights;
+	highlights.add_row(Row_t{ "Marwan Muhammad", "Youssef Tarek", "Muhammad Amr" });
+	readme.add_row(Row_t{ highlights });
+	readme[3].format().font_align(FontAlign::center).hide_border_top();
+	cout << readme<<'\n';
 }

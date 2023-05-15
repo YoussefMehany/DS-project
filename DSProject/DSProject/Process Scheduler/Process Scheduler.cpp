@@ -90,9 +90,11 @@ void Scheduler::WriteData() {
 
 void Scheduler::Get_Data() {
 	int TSR = 0;
+	pOut->PrintReadme();
 	pOut->PrintOut("Enter File name: ");
 	pIn->GetFileName(Filename);
 	pOut->ClearConsole();
+	pOut->PrintReadme();
 	InFile.open(Filename + ".txt");
 	pOut->PrintOut("Processing Input Data...\n");
 	Sleep(750);
@@ -120,6 +122,7 @@ void Scheduler::Get_Data() {
 		KILLSIG.enqueue(kill);
 	}
 	pOut->ClearConsole();
+	pOut->PrintReadme();
 	int x = 1;
 	pOut->PrintOut("Please Enter The Mode of The Interface :\n");
 	pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
@@ -387,8 +390,9 @@ void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 }
 
 void Scheduler::UpdateInterface() {
-
+	
 	if (TRM.GetSize() == M) {
+		pOut->PrintReadme();
 		pOut->PrintOut("Simulation ended, Output file is created\n");
 		return;
 	}
@@ -404,7 +408,7 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(300);
+		else Sleep(100);
 		if (TRM.GetSize() != M)
 			pOut->ClearConsole();
 	}

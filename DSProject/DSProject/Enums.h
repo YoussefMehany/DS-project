@@ -18,7 +18,7 @@ enum InterfaceMode
 	SBS,
 	Silent
 };
-enum Color
+enum Colors
 {
 	RED,
 	YELLOW,
