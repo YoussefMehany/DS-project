@@ -25,7 +25,7 @@ void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BL
 	for (int i = 0; i < size; i++) {
 		if (Multiprocessors[i]->Get_State() == BUSY) {
 			Runcnt++;
-			Runlist += to_string(Multiprocessors[i]->Get_Run()->GetPID()) + " (P"+to_string(i+1)+"), ";
+			Runlist += to_string(Multiprocessors[i]->Get_Run()->GetPID()) + "(P"+to_string(i+1)+"), ";
 		}
 	}
 	if (!Runlist.empty()) {

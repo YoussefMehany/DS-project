@@ -19,6 +19,7 @@ private:
 	int TurnAroundDuration;
 	int WaitingTime;
 	int Ex_DeadLine;
+	bool FMigrated, RMigrated;
 	ProcessState State;
 	Processor* RunProcessor;
 	Process* Lchild, *Rchild, *Parent;
@@ -37,6 +38,8 @@ public:
 	int GetCurrWaitingTime(int TimeStep)const;
 	int GetCPURemainingTime()const;
 	int GetDeadLine()const;
+	bool WasMigratedFCFS()const;
+	bool WasMigratedRR()const;
 	Pair<int, int>* GetIO();
 	Process* GetLeftChild()const;
 	Process* GetRightChild()const;
@@ -58,6 +61,8 @@ public:
 	void UpdateInfo();
 	void SetChildrenState(bool par = true);
 	void PrintOutFile(ofstream& out);
+	void FMigrate();
+	void RMigrate();
 	static int GetTTAT();
 };
 

@@ -123,24 +123,6 @@ void FCFS::FCFSMigration() {
 				break;
 			}
 		}
-		//if (!S->GetSRR()) return; //return if the RR processors are OverHeated
-		//while (R && R->GetCurrWaitingTime(S->Get_TimeStep()) > S->Get_MaxW()) {
-		//    
-		//    S->FCFSMigration(R);
-
-		//    Process* p = nullptr;
-		//    for (int i = 0; i < RDY_LIST.size(); i++) {
-		//        RDY_LIST.GetItem(i, p);
-		//        if (!p->GetParent() && p->GetState() != ORPH) {
-		//            RDY_LIST.Remove(i, R);
-		//            if (!R->GetResponseTime()) R->SetResponseTime(S->Get_TimeStep());
-		//            R->SetState(RUn);
-		//            State = BUSY;
-		//            QFT -= R->GetCPURemainingTime();
-		//            break;
-		//        }
-		//    }
-		//}
 	}
 }
 
