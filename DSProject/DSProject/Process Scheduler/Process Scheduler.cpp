@@ -8,7 +8,7 @@
 #include <windows.h>
 
 Scheduler::Scheduler() {
-	TimeStep = NS = NF = NR = ND = Num_of_Processors = TTAT = RTF = M = MaxW = STL = Fork_Prob = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = ProcessesKilled = 0;
+	TimeStep = NS = NF = NR = ND = Num_of_Processors = TTAT = RTF = M = INIT_M = MaxW = STL = Fork_Prob = ProcessesMaxW = ProcessesRTF = ProcessesStolen = n = ProcessesKilled = 0;
 	Heat_Prob = 2;
 	MultiProcessor = nullptr;
 	LQ = SQ = SFCFS = SSJF = SRR = SEDF = nullptr;
@@ -155,7 +155,7 @@ bool Scheduler::Simulation() {
 		else break;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////// Schedule Algo ///////////////////////////////////
 
 
 	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
@@ -204,7 +204,7 @@ bool Scheduler::Simulation() {
 	if (Kill && Kill->getFirst() == TimeStep) {
 		KILLSIG.dequeue(Kill);
 		for (int i = 0; i < Num_of_Processors; i++) {
-			if (dynamic_cast<FCFS*>(MultiProcessor[i])) {  //KILL From FCFS Only , else Ignore the Signal
+			if (dynamic_cast<FCFS*>(MultiProcessor[i])) {  //KILL From FCFS Only, else Ignore the Signal
 				((FCFS*)MultiProcessor[i])->Kill(Kill->getSecond());
 				ProcessesKilled++;
 			}
@@ -214,27 +214,11 @@ bool Scheduler::Simulation() {
 }
 
 /////////////////////////////////// FCSF->RR Migration////////////////////////////
-int Scheduler::Get_MaxW()const {
-	return MaxW;
-}
-int Scheduler::Get_RTF()const {
-	return RTF;
-}
-int Scheduler::Get_FP() const {
-	return Fork_Prob;
-}
-int Scheduler::Get_NR()  const {
-	return NR;
-}
-int Scheduler::Get_NS()  const {
-	return NS;
-}
 
 void Scheduler::FCFSMigration(Process* Migrated) {
 	Transition(Migrated, RDy);
 	SRR->AddProcess(Migrated);
-	ProcessesMaxW += !Migrated->WasMigratedFCFS(); //to count it only once
-	Migrated->FMigrate();
+	ProcessesMaxW++;
 }
 
 /////////////////////////////// RR->SJF Migration ////////////////////////////////
@@ -242,12 +226,11 @@ void Scheduler::FCFSMigration(Process* Migrated) {
 void Scheduler::RRMigration(Process* Migrated) {
 	Transition(Migrated, RDy);
 	SSJF->AddProcess(Migrated);
-	ProcessesRTF += !Migrated->WasMigratedRR(); //to Count it only once
-	Migrated->RMigrate();
+	ProcessesRTF++;
 }
 
-
 /////////////////////////////////// WORK STEALING ////////////////////////////////
+
 Processor* Scheduler::GetSQ() const {
 	return SQ;
 }
@@ -274,6 +257,7 @@ void Scheduler::WorkStealing() {
 }
 
 /////////////////////////////IO_TASKS//////////////////////////////////////
+
 bool Scheduler::MakeIO(Process* Blocked) { //Check if the IO tasks has ended and if it did we should return it back from the BLK
 	int Remaining = Blocked->GetIO()->getSecond();
 	if (Remaining)
@@ -394,8 +378,8 @@ void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 }
 
 void Scheduler::UpdateInterface() {
-	
 	if (TRM.GetSize() == M) {
+		if(Mode != Silent) pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
 		pOut->PrintShow("Simulation ended, Output file is created\n", 20);
 		return;
 	}
@@ -416,6 +400,24 @@ void Scheduler::UpdateInterface() {
 			pOut->ClearConsole();
 	}
 }
+
+/////////////////////////////Setters and Getters//////////////////////////////////////
+
+int Scheduler::Get_MaxW()const {
+	return MaxW;
+}
+int Scheduler::Get_RTF()const {
+	return RTF;
+}
+int Scheduler::Get_FP() const {
+	return Fork_Prob;
+}
+int Scheduler::Get_NR()  const {
+	return NR;
+}
+int Scheduler::Get_NS()  const {
+	return NS;
+}
 int Scheduler::Get_TimeStep() {
 	return TimeStep;
 }
@@ -434,6 +436,7 @@ Input* Scheduler::getInput() {
 Output* Scheduler::getOutput() {
 	return pOut;
 }
+
 Scheduler::~Scheduler() {
 	delete pIn;
 	delete pOut;

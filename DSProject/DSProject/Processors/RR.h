@@ -14,5 +14,4 @@ public:
 	virtual void OverHeat();
 	virtual void Lose(Process*& Stolen);
 	virtual void Print();
-
 };

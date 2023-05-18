@@ -44,19 +44,19 @@ public:
 	void DecideLongest();
 	void Transition(Process* P, ProcessState T);
 	void DecideShortest(int Type);
-	Process* AddChildToSQ(int RemCPU, int DeadLine);
 	int Get_TimeStep();
 	int Get_MaxW() const;
 	int Get_FP() const;
 	int Get_RTF() const;
 	int Get_NR()  const;
 	int Get_NS()  const;
+	bool Simulation(); //Dividing the Processes on the processors
+	bool MakeIO(Process* Block);
+	Process* AddChildToSQ(int RemCPU, int DeadLine);
 	Processor* GetSQ() const;
 	Processor* GetSSJF() const;
 	Processor* GetSRR() const;
 	Processor* GetSFCFS() const;
-	bool Simulation(); //Dividing the Processes on the processors
-	bool MakeIO(Process* Block);
 	Input* getInput();
 	Output* getOutput();
 	~Scheduler();

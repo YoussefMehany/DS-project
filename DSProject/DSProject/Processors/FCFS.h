@@ -12,9 +12,8 @@ public:
 	virtual void RunProcess();
 	virtual void OverHeat();
 	virtual void Lose(Process*& Leave);
+	virtual void Print();
 	void Forking();
 	void RemoveOrphans();
 	void Kill(int PID);
-	virtual void Print();
-
 };

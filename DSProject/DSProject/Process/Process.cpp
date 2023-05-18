@@ -7,7 +7,6 @@ Process::Process() {
 	State = NEW;
 	Parent = Lchild = Rchild = nullptr;
 	RunProcessor = nullptr;
-	FMigrated = RMigrated = false;
 }
 Process::Process(int ArrivalTime, int CPUTime,int Deadline ,int PID) {
 	this->ArrivalTime = ArrivalTime;
@@ -23,12 +22,11 @@ Process::Process(int ArrivalTime, int CPUTime,int Deadline ,int PID) {
 		this->PID = ++LastID;
 	}
 	State = NEW;
-	FMigrated = RMigrated = false;
 	Lchild = Rchild = Parent = nullptr;
 	RunProcessor = nullptr;
 }
 int Process::GetCurrWaitingTime(int TimeStep)const { 
-	return WaitingTime;
+	return TimeStep - ArrivalTime - (CPUTime - CPUTemp);
 }
 int Process::GetPID()const {
 	return PID;
@@ -53,18 +51,6 @@ int Process::GetWaitingTime()const {
 }
 int Process::GetTIOD()const{
 	return TIOD;
-}
-bool Process::WasMigratedFCFS()const { //Not to count it twice when calculating the migration stats
-	return FMigrated;
-}
-bool Process::WasMigratedRR()const { //Not to count it twice when calculating the migration stats
-	return RMigrated;
-}
-void Process::FMigrate() {
-	FMigrated = true;
-}
-void Process::RMigrate() {
-	RMigrated = true;
 }
 int Process::GetDeadLine()const {
 	return Ex_DeadLine;

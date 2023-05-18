@@ -13,5 +13,4 @@ public:
 	virtual void AddProcess(Process* process);
 	virtual void Lose(Process*& Stolen);
 	virtual void Print();
-
 };

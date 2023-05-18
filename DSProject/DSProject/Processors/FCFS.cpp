@@ -29,7 +29,7 @@ void FCFS::RemoveOrphans() { //Check for orphans to move to TRM
 		Process* p = nullptr;
 		RDY_LIST.GetItem(i, p);
 		if (p->GetState() == ORPH) {
-			QFT -= p->GetCPURemainingTime(); //need to discuss
+			QFT -= p->GetCPURemainingTime();
 			RDY_LIST.Remove(i, p);
 			S->TO_TRM(p);
 			i--;
@@ -106,7 +106,6 @@ void FCFS::Kill(int PID) { //KILLSIG
 }
 
 void FCFS::FCFSMigration() {
-
 	if (S->Get_NR()) { //Don't enter if no RR exists or process is a child because children must be in fcfs only
 		S->DecideShortest(2); //Check that there is a non-heated Processor of type RR to move too, and return if there isnt
 		if (!S->GetSRR()) return;
