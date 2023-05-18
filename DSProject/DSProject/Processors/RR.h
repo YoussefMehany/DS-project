@@ -10,6 +10,8 @@ public:
 	void RRMigration();
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
+	virtual void RunProcess();
+	virtual void OverHeat();
 	virtual void Lose(Process*& Stolen);
 	virtual void Print();
 

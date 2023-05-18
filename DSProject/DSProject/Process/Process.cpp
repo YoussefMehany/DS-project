@@ -27,8 +27,8 @@ Process::Process(int ArrivalTime, int CPUTime,int Deadline ,int PID) {
 	Lchild = Rchild = Parent = nullptr;
 	RunProcessor = nullptr;
 }
-int Process::GetCurrWaitingTime(int TimeStep)const {
-	return TimeStep - ArrivalTime - (CPUTime - CPUTemp);
+int Process::GetCurrWaitingTime(int TimeStep)const { 
+	return WaitingTime;
 }
 int Process::GetPID()const {
 	return PID;
@@ -54,10 +54,10 @@ int Process::GetWaitingTime()const {
 int Process::GetTIOD()const{
 	return TIOD;
 }
-bool Process::WasMigratedFCFS()const {
+bool Process::WasMigratedFCFS()const { //Not to count it twice when calculating the migration stats
 	return FMigrated;
 }
-bool Process::WasMigratedRR()const {
+bool Process::WasMigratedRR()const { //Not to count it twice when calculating the migration stats
 	return RMigrated;
 }
 void Process::FMigrate() {
@@ -104,14 +104,14 @@ void Process::SetResponseTime(int TimeFirst) {
 	ResponseTime = TimeFirst - ArrivalTime;
 }
 void Process::SetTurnAroundDuration() {
-	TurnAroundDuration = TerminationTime - ArrivalTime + 1;
+	TurnAroundDuration = TerminationTime - ArrivalTime + 1; // + 1 Because it runs one time in the same timestep that it terminates in, so we should add that too
 	TTAT += TurnAroundDuration;
 }
 int Process::GetTTAT() {
 	return TTAT;
 }
-void Process::SetWaitingTime() {
-	  WaitingTime =  TurnAroundDuration - (CPUTime-CPUTemp);
+void Process::SetWaitingTime() { //Added that CPUTime - CPUTemp means to subtract the execution time only and not the whole cpu time
+	 WaitingTime =  TurnAroundDuration - (CPUTime-CPUTemp); //To avoid negative waiting time when a process is killed or terminated before its finish time
 }
 void Process::SetState(ProcessState state) {
 	State = state;
@@ -134,7 +134,7 @@ void Process::SetRightChild(Process* child) {
 void Process::SetParent(Process* parent) {
 	Parent = parent;
 }
-void Process::SetTIOD(int TIOD) {
+void Process::SetTIOD(int TIOD) { //Total IO duration
 	this->TIOD = TIOD;
 }
 void Process::UpdateInfo() {

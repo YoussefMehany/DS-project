@@ -18,6 +18,9 @@ public:
 	virtual void AddProcess(Process* process) = 0;
 	virtual void Print() = 0;
 	virtual void Lose(Process*& Stolen) = 0;
+	void AddToRun();
+	virtual void RunProcess() = 0;
+	virtual void OverHeat() = 0;
 	double Get_pUtil() const;
 	double Get_pLoad() const;
 	int GET_QFT()const;

@@ -9,6 +9,8 @@ public:
 	FCFS(Scheduler* Sched,int n);
 	virtual void ScheduleAlgo();
 	virtual void AddProcess(Process* process);
+	virtual void RunProcess();
+	virtual void OverHeat();
 	virtual void Lose(Process*& Leave);
 	void Forking();
 	void RemoveOrphans();

@@ -39,7 +39,7 @@ void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int EDFcnt, in
 }
 
 void Scheduler::WriteData() {
-	pOut->PrintShow("Enter a name for output file : ", 20);
+	pOut->PrintShow("Enter a name for output file: ", 20);
 	pIn->GetFileName(Filename);
 	OutFile.open("Output Files/" + Filename + ".txt");
 	OutFile << "TT\tPID\tAT\tCT\tIO_D\tWT\tRT\tTRT\n";
@@ -86,7 +86,7 @@ void Scheduler::WriteData() {
 	AvgUtil /= Num_of_Processors;
 	OutFile << "\nAvg Utilization = " << AvgUtil << "%\n";
 	pOut->ClearConsole();
-	pOut->PrintShow("File has been created , check it please.", 20);
+	pOut->PrintShow("File has been created, check it please.", 20);
 	pOut->LineBreaks(11);
 	pOut->ThankYou();
 	pOut->LineBreaks(12);
@@ -99,7 +99,7 @@ void Scheduler::Get_Data() {
 	pIn->GetFileName(Filename);
 	InFile.open("Input Files/" + Filename + ".txt");
 	while (!InFile.is_open()) {
-		pOut->PrintOut(Filename + " doesn't exist in Input Files folder , please Enter a valid name: ");
+		pOut->PrintOut(Filename + " doesn't exist in Input Files folder, please Enter a valid name: ");
 		pIn->GetFileName(Filename);
 		InFile.open("Input Files/" + Filename + ".txt");
 	}
@@ -131,7 +131,7 @@ void Scheduler::Get_Data() {
 	}
 	pOut->ClearConsole();
 	int x = 1;
-	pOut->PrintOut("Please Enter The Mode of The Interface :\n");
+	pOut->PrintOut("Please Enter The Mode of The Interface:\n");
 	pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
 	pIn->GetInput(x);
 	Mode = InterfaceMode(x - 1);
@@ -148,7 +148,7 @@ bool Scheduler::Simulation() {
 	while (!NEW.isEmpty()) {
 		Process* temp = nullptr;
 		NEW.peek(temp);
-		if (TimeStep == temp->GetArrivalTime()) {
+		if (TimeStep == temp->GetArrivalTime()) { //add to shortest RDY if its arrival time has came
 			NEW.dequeue(temp);
 			TO_SHORTEST_RDY(temp);
 		}
@@ -160,7 +160,7 @@ bool Scheduler::Simulation() {
 
 	for (int i = 0; i < Num_of_Processors; i++) { //Move process from RDY to RUN if processor is IDLE
 		int Overheat_Prob = 1 + rand() % 100;
-		if (Overheat_Prob <= Heat_Prob) {
+		if (Overheat_Prob <= Heat_Prob) { //check for the heat probability and set state to heat if its true
 			MultiProcessor[i]->SetProcessorState(STOP);
 		}
 		MultiProcessor[i]->ScheduleAlgo();
@@ -172,14 +172,14 @@ bool Scheduler::Simulation() {
 	if (BLK.peek(Blocked)) {
 		if (!MakeIO(Blocked)) {
 			BLK.dequeue(Blocked);
-			Blocked->NextIO();
+			Blocked->NextIO(); //when this IO finishes, to proceed to the next one
 			TO_SHORTEST_RDY(Blocked);
 		}
 	}
 
 	/////////////////////////////////// WORK STEALING ///////////////////////////////
 
-	if (!(TimeStep % STL) && Num_of_Processors)
+	if (!(TimeStep % STL) && Num_of_Processors) //for each STL we should apply the work stealing
 		WorkStealing();
 
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
@@ -231,22 +231,18 @@ int Scheduler::Get_NS()  const {
 }
 
 void Scheduler::FCFSMigration(Process* Migrated) {
-	Migrated->SetState(RDy);
-	Migrated->GetProcessor()->UpdateState();
-	Migrated->SetProcessor(nullptr);
+	Transition(Migrated, RDy);
 	SRR->AddProcess(Migrated);
-	ProcessesMaxW += !Migrated->WasMigratedFCFS();
+	ProcessesMaxW += !Migrated->WasMigratedFCFS(); //to count it only once
 	Migrated->FMigrate();
 }
 
 /////////////////////////////// RR->SJF Migration ////////////////////////////////
 
 void Scheduler::RRMigration(Process* Migrated) {
-	Migrated->SetState(RDy);
-	Migrated->GetProcessor()->UpdateState();
-	Migrated->SetProcessor(nullptr);
+	Transition(Migrated, RDy);
 	SSJF->AddProcess(Migrated);
-	ProcessesRTF += !Migrated->WasMigratedRR();
+	ProcessesRTF += !Migrated->WasMigratedRR(); //to Count it only once
 	Migrated->RMigrate();
 }
 
@@ -264,7 +260,7 @@ void Scheduler::WorkStealing() {
 	if (!LQ) return;
 	int LQF = LQ->GET_QFT(), SQF = SQ->GET_QFT();
 	double StealLimit = double(LQF - SQF) / LQF;
-	while (LQF > 0 && StealLimit > 0.4)
+	while (LQF > 0 && StealLimit > 0.4) //Keep Stealing processes until the steal limit is less than or equal to 0.4
 	{
 		LQ->Lose(Stolen);
 		if (!Stolen) break;
@@ -278,7 +274,7 @@ void Scheduler::WorkStealing() {
 }
 
 /////////////////////////////IO_TASKS//////////////////////////////////////
-bool Scheduler::MakeIO(Process* Blocked) {
+bool Scheduler::MakeIO(Process* Blocked) { //Check if the IO tasks has ended and if it did we should return it back from the BLK
 	int Remaining = Blocked->GetIO()->getSecond();
 	if (Remaining)
 		Blocked->GetIO()->SetSecond(--Remaining);
@@ -291,7 +287,7 @@ void Scheduler::DecideLongest() {
 	int index = -1;
 	LQ = nullptr;
 	for (int i = 0; i < Num_of_Processors; i++) {
-		if (MultiProcessor[i]->Get_State() != STOP) {
+		if (MultiProcessor[i]->Get_State() != STOP) { //Check that this processor isn't overheated
 			int QFT = MultiProcessor[i]->GET_QFT();
 			if (QFT > CPU_Max) {
 				index = i;
@@ -341,30 +337,31 @@ Process* Scheduler::AddChildToSQ(int RemCPU,int DeadLine) {
 	CoolingSystem(true);
 	DecideShortest(0);
 	SFCFS->AddProcess(child);
-	M++;
+	M++; //Increment the number of processes as we create a new process (forked child)
 	return child;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 void Scheduler::TO_BLK(Process* P) {
-	P->SetState(BLk);
-	P->GetProcessor()->UpdateState();
-	P->SetProcessor(nullptr);
+	Transition(P, BLk);
 	BLK.enqueue(P);
 }
 void Scheduler::TO_TRM(Process* P) {
 	P->SetTerminationTime(TimeStep);
 	P->SetTurnAroundDuration();
 	P->SetWaitingTime();
-	P->SetState(TRm);
-	P->GetProcessor()->UpdateState();
-	P->SetProcessor(nullptr);
+	Transition(P, TRm);
 	TRM.enqueue(P);
 }
+void Scheduler::Transition(Process* P, ProcessState T) { //Function reusability
+	P->SetState(T);
+	P->GetProcessor()->UpdateState();
+	P->SetProcessor(nullptr);
+}
 
-void Scheduler::CoolingSystem(bool fcfs) {
-	Processor* Coolest = nullptr;
-	int OverHeated = 0;
+void Scheduler::CoolingSystem(bool fcfs) { //Our cooling system operates when all the processors are overheated
+	Processor* Coolest = nullptr; //So we loop on all of them and return the coolest processor back to idle, reset its heat factor
+	int OverHeated = 0; //So the program can continue working without errors
 	int MinHeatFactor = n + 1;
 	for (int i = 0; i < Num_of_Processors; i++) {
 		bool Stop = MultiProcessor[i]->Get_State() == STOP;
@@ -376,7 +373,7 @@ void Scheduler::CoolingSystem(bool fcfs) {
 			OverHeated++;
 		}
 	}
-	if (OverHeated == (fcfs ? NF : Num_of_Processors)) {
+	if (OverHeated == (fcfs ? NF : Num_of_Processors)) { //if this processor is fcfs then we move that process to another FCFS processor to avoid children migration
 		Coolest->SetProcessorState(IDLE);
 		Coolest->Reset_HeatFactor();
 	}

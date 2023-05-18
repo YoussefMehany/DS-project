@@ -42,7 +42,7 @@ void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BL
 	cout << endl;
 	PrintColor(WHITE);
 }
-void Output::PrintColor(Colors clr) {
+void Output::PrintColor(Colors clr) { //Print the code that colors the terminal
 	switch (clr) {
 		case BOLDMAG:
 			cout << "\033[1m\033[35m";
@@ -100,7 +100,7 @@ void Output::PrintChar(char c, int count, Colors color) {
 	}
 	PrintColor(WHITE);
 }
-void Output::Intro() {
+void Output::Intro() { //Print the tabulated intro of the project
 	PrintChar(' ', 10);
 	PrintOut("+");
 	PrintChar('-', 97, YELLOW);

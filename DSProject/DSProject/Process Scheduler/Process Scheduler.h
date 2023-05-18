@@ -42,6 +42,7 @@ public:
 	void FCFSMigration(Process* Migrate);
 	void RRMigration(Process* Migrate);
 	void DecideLongest();
+	void Transition(Process* P, ProcessState T);
 	void DecideShortest(int Type);
 	Process* AddChildToSQ(int RemCPU, int DeadLine);
 	int Get_TimeStep();

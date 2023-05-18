@@ -8,6 +8,8 @@ class EDF : public Processor {
 public:
 	EDF(Scheduler* Sched, int n);
 	virtual void ScheduleAlgo();
+	virtual void RunProcess();
+	virtual void OverHeat();
 	virtual void AddProcess(Process* process);
 	virtual void Lose(Process*& Stolen);
 	virtual void Print();

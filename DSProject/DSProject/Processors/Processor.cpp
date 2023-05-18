@@ -5,7 +5,7 @@ int Processor::Counter = 0;
 Processor::Processor(Scheduler* Sched, int n)
 	:S(Sched), QFT(0), State(IDLE), ID(++Counter), R(nullptr), TIT(0), TBT(0), pLoad(0), pUtil(0), N_TEMP(n), N(n) {}
 
-void Processor::UpdateState() {
+void Processor::UpdateState() { //Update processor state if R is null or not in Run state
 	if (!R || (R->GetState() != RUn && R->GetState() != ORPH)) {
 		State = IDLE;
 		R = nullptr;
@@ -15,7 +15,11 @@ void Processor::UpdateState() {
 void Processor::SetProcessorState(ProcessorState processor_state) {
 	State = processor_state;
 }
-
+void Processor::AddToRun() {
+	State = BUSY;
+	R->SetState(RUn);
+	QFT -= R->GetCPURemainingTime();
+}
 ProcessorState Processor::Get_State()const {
 	return State;
 }
@@ -37,8 +41,8 @@ void Processor::Reset_HeatFactor() {
 }
 
 double Processor::Get_pUtil() const {
-	return (double(TBT) / (TIT + TBT)) * 100;
+	return (double(TBT) / (TIT + TBT)) * 100; //Total Busy Time / (Total Idle Time + Total Busy Time) * 100
 }
 double Processor::Get_pLoad() const {
-	return (double(TBT) / Process::GetTTAT()) * 100;
+	return (double(TBT) / Process::GetTTAT()) * 100; //Total Busy Time / Total TurnaroundTime * 100
 }
