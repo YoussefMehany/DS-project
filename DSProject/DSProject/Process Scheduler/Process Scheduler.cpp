@@ -97,8 +97,13 @@ void Scheduler::Get_Data() {
 	pOut->Intro();
 	pOut->PrintOut("Enter File name: ");
 	pIn->GetFileName(Filename);
-	pOut->ClearConsole();
 	InFile.open("Input Files/" + Filename + ".txt");
+	while (!InFile.is_open()) {
+		pOut->PrintOut(Filename + " doesn't exist in Input Files folder , please Enter a valid name: ");
+		pIn->GetFileName(Filename);
+		InFile.open("Input Files/" + Filename + ".txt");
+	}
+	pOut->ClearConsole();
 	pOut->PrintShow("Processing Input Data", 20);
 	pOut->PrintShow("...", 300);
 	InFile >> NF >> NS >> NR >> ND >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
