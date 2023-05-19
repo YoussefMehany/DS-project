@@ -1,2 +1,8 @@
--if all of the processors are overheated then we should turn the coolest processor to IDLE state
--if the process being moved from the overheated processor is a forked process and all other FCFS are also overheated we keep it inside of the RDY_LIST
+			///////////////////////////////////////// OverHeat //////////////////////////////////////
+
+-If all of the processors are overheated then we should turn the coolest processor to IDLE state
+-If the process being moved from the overheated processor is a forked process and all other FCFS are also overheated we keep it inside of the RDY_LIST
+
+			///////////////////////////////////////// EDF ///////////////////////////////////////////
+
+-According to the document statements, the process runs inside the processor until it finishes or another process with earlier deadline enters the processor, therefore the processes inside the EDF aren't allowed to leave Run State and go to block for IO

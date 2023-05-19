@@ -66,6 +66,7 @@ Pair<int, int>* Process::GetIO() {
 void Process::NextIO() {
 	Pair<int, int>* IO = nullptr;
 	IO_LIST.dequeue(IO);
+	delete IO;
 }
 Process* Process::GetLeftChild()const {
 	return Lchild;
@@ -97,7 +98,7 @@ int Process::GetTTAT() {
 	return TTAT;
 }
 void Process::SetWaitingTime() { //Added that CPUTime - CPUTemp means to subtract the execution time only and not the whole cpu time
-	 WaitingTime =  TurnAroundDuration - (CPUTime-CPUTemp); //To avoid negative waiting time when a process is killed or terminated before its finish time
+	 WaitingTime =  TurnAroundDuration - (CPUTime - CPUTemp); //To avoid negative waiting time when a process is killed or terminated before its finish time
 }
 void Process::SetState(ProcessState state) {
 	State = state;
@@ -130,8 +131,10 @@ void Process::UpdateInfo() {
 	IO_LIST.peek(IO);
 
 	if (IO)
-		if (!IO->getFirst())      ///If we entered and found out that the IO_R is 0 this means that this process is scheduled by EDF so it wont make an IO so we 
+		if (!IO->getFirst()) {      ///If we entered and found out that the IO_R is 0 this means that this process is scheduled by EDF so it wont make an IO so we 
 			IO_LIST.dequeue(IO); ///Removed it here so that when it goes to another one it make the remaining IOs 
+			delete IO;
+		}
 		else 
 			IO->SetFirst(IO->getFirst() - 1);
 		
@@ -164,4 +167,10 @@ void Process::PrintOutFile(ofstream& out)
 	out << TerminationTime << '\t' << PID << '\t' << ArrivalTime << '\t' <<
 		CPUTime << '\t'<<TIOD<<'\t'<<WaitingTime<<'\t'<<ResponseTime<<'\t'<<TurnAroundDuration
 		<<'\n';
+}
+Process::~Process() {
+	Pair<int, int>* IO = nullptr;
+	while (IO_LIST.dequeue(IO)) {
+		delete IO;
+	}
 }

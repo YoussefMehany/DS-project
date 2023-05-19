@@ -18,6 +18,10 @@ public:
 			head = head->getNext();
 		}
 	}
+	~List() {
+		T temp;
+		while (RemoveHead(temp));
+	}
 	bool Empty()const { return Size == 0; }
 	int size()const { return Size; }
 	T head()const { return Head->getItem(); }

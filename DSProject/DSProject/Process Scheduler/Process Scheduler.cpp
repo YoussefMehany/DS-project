@@ -44,22 +44,22 @@ void Scheduler::WriteData() {
 	OutFile.open("Output Files/" + Filename + ".txt");
 	OutFile << "TT\tPID\tAT\tCT\tIO_D\tWT\tRT\tTRT\n";
 	Process* p = nullptr;
-	Queue<Process*> TRMT = TRM;
 	int AvgResponseTime = 0, AvgWaitingTime = 0, AvgTurnAroundTime = 0;
 	int Early = 0; 
 	double AvgUtil = 0;
-	while (TRMT.dequeue(p)) {
+	while (TRM.dequeue(p)) {
 		p->PrintOutFile(OutFile);
 		AvgResponseTime += p->GetResponseTime();
 		AvgWaitingTime += p->GetWaitingTime();
 		AvgTurnAroundTime += p->GetTurnAroundDuration();
 		if (p->GetTerminationTime() < p->GetDeadLine())
 			Early++;
+		delete p;
 	}
-	AvgResponseTime /= TRM.GetSize();
-	AvgWaitingTime /= TRM.GetSize();
-	AvgTurnAroundTime /= TRM.GetSize();
-	OutFile << "Processes : " << TRM.GetSize() << '\n'
+	AvgResponseTime /= M;
+	AvgWaitingTime /= M;
+	AvgTurnAroundTime /= M;
+	OutFile << "Processes : " << M << '\n'
 		<< "Avg WT = " << AvgWaitingTime << ",\t\tAvg RT = " << AvgResponseTime <<
 		",\t\tAvgTRT = " << AvgTurnAroundTime << '\n';
 	double forked_per = 100 * (double)(M - INIT_M) / M;
@@ -177,11 +177,6 @@ bool Scheduler::Simulation() {
 		}
 	}
 
-	/////////////////////////////////// WORK STEALING ///////////////////////////////
-
-	if (!(TimeStep % STL) && Num_of_Processors) //for each STL we should apply the work stealing
-		WorkStealing();
-
 	/////////////////////////////////// Remove Orphans ///////////////////////////////
 
 	for (int i = 0; i < Num_of_Processors; i++) {
@@ -209,7 +204,14 @@ bool Scheduler::Simulation() {
 				ProcessesKilled++;
 			}
 		}
+		delete Kill;
 	}
+
+	/////////////////////////////////// WORK STEALING ///////////////////////////////
+
+	if (!(TimeStep % STL) && Num_of_Processors) //for each STL we should apply the work stealing
+		WorkStealing();
+
 	return true;
 }
 
@@ -395,7 +397,7 @@ void Scheduler::UpdateInterface() {
 			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
 			getc(stdin);
 		}
-		else Sleep(200);
+		else Sleep(1000);
 		if (TRM.GetSize() != M)
 			pOut->ClearConsole();
 	}
@@ -440,10 +442,6 @@ Output* Scheduler::getOutput() {
 Scheduler::~Scheduler() {
 	delete pIn;
 	delete pOut;
-	Process* p = nullptr;
-	while (TRM.dequeue(p)) {
-		delete p;
-	}
 	Pair<int, int>* k = nullptr;
 	while (KILLSIG.dequeue(k)) {
 		delete k;
@@ -451,5 +449,5 @@ Scheduler::~Scheduler() {
 	for (int i = 0; i < Num_of_Processors; i++) {
 		delete MultiProcessor[i];
 	}
-	delete MultiProcessor;
+	delete []MultiProcessor;
 }

@@ -140,7 +140,7 @@ void FCFS::Lose(Process*& Stolen) { //Work stealing function
 	Process* p = nullptr;
 	for (int i = 0; i < RDY_LIST.size(); i++) {
 		RDY_LIST.GetItem(i, p);
-		if (!p->GetParent() && p->GetState() != ORPH) { //should find a process that's not a child process
+		if (!p->GetParent()) { //should find a process that's not a child process
 			RDY_LIST.Remove(i, p);
 			QFT -= p->GetCPURemainingTime();
 			p->SetProcessor(nullptr);

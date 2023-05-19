@@ -25,6 +25,7 @@ private:
 	Process* Lchild, *Rchild, *Parent;
 public:
 	Process();
+	~Process();
 	friend ostream& operator<<(ostream& out,const Process& process);
 	Process(int ArrivalTime, int CPUTime,int Deadline ,int PID = -1);
 	int GetPID()const;
