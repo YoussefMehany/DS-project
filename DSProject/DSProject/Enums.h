@@ -28,5 +28,7 @@ enum Colors
 	ORANGE,
 	GREEN,
 	CYAN,
-	BLUE
+	BLUE,
+	GOLD,
+	GREY
 };

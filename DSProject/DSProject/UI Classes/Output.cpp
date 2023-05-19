@@ -3,12 +3,11 @@
 
 Output::Output() {}
 
-void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BLK, Queue<Process*> TRM, int timestep)
+void Output::PrintInfo(Processor** Multiprocessors, int size, Queue<Process*> BLK, Queue<Process*> TRM, int timestep, InterfaceMode Mode)
 {
 	int Runcnt = 0;
 	string Runlist;
-	PrintColor(BOLDMAG); //Base Color
-	PrintColor(WHITE);
+	PrintColor(Mode == SBS ? MAGENTA : ORANGE);
 	cout << "Current Timestep: " << timestep << endl << endl;
 	PrintColor(CYAN);
 	cout << "--------------   RDY processes   --------------" << endl;
@@ -51,7 +50,7 @@ void Output::PrintColor(Colors clr) { //Print the code that colors the terminal
 			cout << "\033[91m";
 			break;
 		case MAGENTA:
-			cout << "\033[35m";
+			cout << "\033[38;2;218;112;214m";
 			break;
 		case YELLOW:
 			cout << "\033[33m";
@@ -71,7 +70,12 @@ void Output::PrintColor(Colors clr) { //Print the code that colors the terminal
 		case BLUE:
 			cout << "\033[34m";
 			break;
-
+		case GREY:
+			cout << "\033[38;2;192;192;192m";
+			break;
+		case GOLD:
+			cout << "\033[38;2;255;215;0m";
+			break;
 	}
 }
 void Output::ClearConsole() {
@@ -87,11 +91,13 @@ void Output::LineBreaks(int count) {
 		cout << '\n';
 	}
 }
-void Output::PrintShow(string word, int duration) {
+void Output::PrintShow(string word, int duration, Colors color) {
+	PrintColor(color);
 	for (int i = 0; i < word.size(); i++) {
 		cout << word[i];
 		Sleep(duration);
 	}
+	PrintColor(WHITE);
 }
 void Output::PrintChar(char c, int count, Colors color) {
 	PrintColor(color);
@@ -174,7 +180,7 @@ void Output::ThankYou() {
 	PrintChar(' ', 40);
 	PrintOut("|", YELLOW);
 	PrintChar(' ', 14);
-	PrintOut("Thank You!", CYAN);
+	PrintOut("Thank You!", GOLD);
 	PrintChar(' ', 14);
 	PrintOut("|", YELLOW);
 	PrintChar(' ', 40);

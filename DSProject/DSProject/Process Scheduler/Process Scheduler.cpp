@@ -39,7 +39,8 @@ void Scheduler::AddProcessors(int FCFScnt, int SJFcnt, int RRcnt, int EDFcnt, in
 }
 
 void Scheduler::WriteData() {
-	pOut->PrintShow("Enter a name for output file: ", 20);
+	pOut->PrintColor(BOLDMAG); //Base Color
+	pOut->PrintShow("Enter a name for output file: ", 20, CYAN);
 	pIn->GetFileName(Filename);
 	OutFile.open("Output Files/" + Filename + ".txt");
 	OutFile << "TT\tPID\tAT\tCT\tIO_D\tWT\tRT\tTRT\n";
@@ -86,26 +87,27 @@ void Scheduler::WriteData() {
 	AvgUtil /= Num_of_Processors;
 	OutFile << "\nAvg Utilization = " << AvgUtil << "%\n";
 	pOut->ClearConsole();
-	pOut->PrintShow("File has been created, check it please.", 20);
+	pOut->PrintShow("File has been created, check it please.", 20, CYAN);
 	pOut->LineBreaks(11);
 	pOut->ThankYou();
 	pOut->LineBreaks(12);
 }
 
 void Scheduler::Get_Data() {
+	pOut->PrintColor(BOLDMAG); //Base Color
 	int TSR = 0;
 	pOut->Intro();
-	pOut->PrintOut("Enter File name: ");
+	pOut->PrintOut("Enter File name: ", CYAN);
 	pIn->GetFileName(Filename);
 	InFile.open("Input Files/" + Filename + ".txt");
 	while (!InFile.is_open()) {
-		pOut->PrintOut(Filename + " doesn't exist in Input Files folder, please Enter a valid name: ");
+		pOut->PrintOut(Filename + " doesn't exist in Input Files folder, please Enter a valid name: ", CYAN);
 		pIn->GetFileName(Filename);
 		InFile.open("Input Files/" + Filename + ".txt");
 	}
 	pOut->ClearConsole();
-	pOut->PrintShow("Processing Input Data", 20);
-	pOut->PrintShow("...", 300);
+	pOut->PrintShow("Processing Input Data", 20, GOLD);
+	pOut->PrintShow("...", 300, GOLD);
 	InFile >> NF >> NS >> NR >> ND >> TSR >> RTF >> MaxW >> STL >> Fork_Prob >> n >> INIT_M;
 	M = INIT_M;
 	for (int i = 0; i < INIT_M; i++) {
@@ -131,8 +133,10 @@ void Scheduler::Get_Data() {
 	}
 	pOut->ClearConsole();
 	int x = 1;
-	pOut->PrintOut("Please Enter The Mode of The Interface:\n");
-	pOut->PrintOut("1.Interactive Mode\n2.Step-By-Step Mode\n3.Silent Mode\n");
+	pOut->PrintOut("Please Enter The Mode of The Interface:\n", CYAN);
+	pOut->PrintOut("1.Interactive Mode\n", ORANGE);
+	pOut->PrintOut("2.Step-By-Step Mode\n", MAGENTA);
+	pOut->PrintOut("3.Silent Mode\n", YELLOW);
 	pIn->GetInput(x);
 	Mode = InterfaceMode(x - 1);
 	pOut->ClearConsole();
@@ -380,21 +384,22 @@ void Scheduler::TO_SHORTEST_RDY(Process* P, bool fcfs) {
 }
 
 void Scheduler::UpdateInterface() {
+	pOut->PrintColor(BOLDMAG); //Base Color
 	if (TRM.GetSize() == M) {
-		if(Mode != Silent) pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
-		pOut->PrintShow("Simulation ended, Output file is created\n", 20);
+		if(Mode != Silent) pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep, Mode);
+		pOut->PrintShow("Simulation ended, Output file is created\n", 20, CYAN);
 		return;
 	}
 
 	if (Mode == Silent)
 	{
 		if (TimeStep == 1)
-			pOut->PrintShow("Silent Mode............ Simulation Starts..........\n", 20);
+			pOut->PrintShow("Silent Mode............ Simulation Starts..........\n", 20, YELLOW);
 	}
 	else {
-		pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep);
+		pOut->PrintInfo(MultiProcessor, Num_of_Processors, BLK, TRM, TimeStep, Mode);
 		if (Mode == Interactive) {
-			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n");
+			pOut->PrintOut("PRESS ANY KEY TO MOVE TO NEXT STEP!\n", CYAN);
 			getc(stdin);
 		}
 		else Sleep(1000);

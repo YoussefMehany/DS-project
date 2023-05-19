@@ -70,7 +70,7 @@ void RR::Round() {
 
 void RR::Print() {
 	Output* pOut = S->getOutput();
-	Colors color = State == STOP ? RED : State == BUSY ? GREEN : WHITE;
+	Colors color = State == STOP ? RED : State == BUSY ? GREEN : GREY;
 	pOut->PrintOut("Processor " + to_string(ID), color);
 	pOut->PrintOut("[RR]: " + to_string(RDY_LIST.GetSize()) + " RDY: ", color);
 	pOut->PrintColor(color);

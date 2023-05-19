@@ -71,7 +71,7 @@ void EDF::AddProcess(Process* process) {
 }
 void EDF::Print() {
 	Output* pOut = S->getOutput();
-	Colors color = State == STOP ? RED : State == BUSY ? GREEN : WHITE;
+	Colors color = State == STOP ? RED : State == BUSY ? GREEN : GREY;
 	pOut->PrintOut("Processor " + to_string(ID), color);
 	pOut->PrintOut("[EDF]: " + to_string(RDY_LIST.getSize()) + " RDY: ", color);
 	pOut->PrintColor(color);
