@@ -56,19 +56,18 @@ void FCFS::AddProcess(Process* process) {
 
 void FCFS::OverHeat() {
 	if (N_TEMP == N) {
+		QFT = 0;
+		int Size = RDY_LIST.size();
 		if (R) {
 			R->SetProcessor(nullptr);
 			S->TO_SHORTEST_RDY(R, true);
 		}
-		int Size = RDY_LIST.size();
 		while (Size--) {
 			RDY_LIST.RemoveHead(R);
 			R->SetProcessor(nullptr);
 			S->TO_SHORTEST_RDY(R, true);
 		}
 		R = nullptr;
-		QFT = 0;
-
 	}
 	else if (!N_TEMP) { //return the processor back to idle if the cooldown ends, and reset the heat factor
 		State = IDLE;

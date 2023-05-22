@@ -37,20 +37,17 @@ void SJF::RunProcess() {
 
 void SJF::OverHeat() {
 	if (N_TEMP == N) {
+		QFT = 0;
+		int Size = RDY_LIST.getSize();
 		if (R) {
 			R->SetProcessor(nullptr);
 			S->TO_SHORTEST_RDY(R);
 		}
-
-		int Size = RDY_LIST.getSize();
-
 		while (Size--) {
 			RDY_LIST.dequeue(R);
 			R->SetProcessor(nullptr);
 			S->TO_SHORTEST_RDY(R);
 		}
-
-		QFT = 0;
 		R = nullptr;
 	}
 	else if (!N_TEMP) { //If Cooldown ended then reset heat factor and return back to idle 
