@@ -42,7 +42,6 @@ void EDF::OverHeat() {
 			R->SetProcessor(nullptr);
 			S->TO_SHORTEST_RDY(R);
 		}
-
 		R = nullptr;
 	}
 	else if (!N_TEMP) { //when cooldown ends, reset heat factor and return back to idle state
