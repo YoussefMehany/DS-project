@@ -181,14 +181,7 @@ bool Scheduler::Simulation() {
 		}
 	}
 
-	/////////////////////////////////// Remove Orphans ///////////////////////////////
-
-	for (int i = 0; i < Num_of_Processors; i++) {
-		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
-			((FCFS*)MultiProcessor[i])->RemoveOrphans();
-		}
-	}
-
+	
 	///////////////////////////////// Forking /////////////////////////////////////
 
 	for (int i = 0; i < Num_of_Processors; i++) {
@@ -209,6 +202,13 @@ bool Scheduler::Simulation() {
 			}
 		}
 		delete Kill;
+	}
+    /////////////////////////////////// Remove Orphans ///////////////////////////////
+
+	for (int i = 0; i < Num_of_Processors; i++) {
+		if (dynamic_cast<FCFS*>(MultiProcessor[i])) {
+			((FCFS*)MultiProcessor[i])->RemoveOrphans();
+		}
 	}
 
 	/////////////////////////////////// WORK STEALING ///////////////////////////////
